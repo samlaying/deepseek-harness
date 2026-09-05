@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json.schemastore.org/codex-hooks.json",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/decision-hook.py SessionStart",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/decision-hook.py UserPromptSubmit",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/decision-hook.py Stop",
+            "timeout": 120
+          }
+        ]
+      }
+    ]
+  }
+}
