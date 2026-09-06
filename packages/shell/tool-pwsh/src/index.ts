@@ -61,13 +61,33 @@ export const Config: z<Config> = z.object({
 /** Parsed tool args; execute validates value constraints absent from ParameterSchemaSpec. */
 interface PwshToolArgs {
   command: string
-  description: string
+  description?: string
   timeoutMs?: number
   workdir?: string
   run_in_background?: boolean
   sandbox_permissions?: string
   justification?: string
 }
+
+/**
+ * UI label: optional `description`, otherwise the executed `command`.
+ * @param args - call arguments after schema validation.
+ * @returns Non-empty label for the pending card.
+ */
+function displayLabel(args: { command: string; description?: string }): string {
+  const label = args.description?.trim()
+  return label === undefined || label.length === 0 ? args.command : label
+}
+
+/**
+ * Model-visible replacement when the call omits `command`. Schema validation
+ * already prefixes `Error:`; this callback only replaces that body.
+ */
+const MISSING_COMMAND_CONTENT
+  = 'Error: invalid arguments: missing required property "command". '
+    + '`command` is the shell string that runs. `description` is an optional UI label and is never executed. '
+    + 'Retry with `command` set, for example {"command":"Get-Process","description":"List running processes"}. '
+    + 'Do not retry with only `description`.'
 
 /** The canonical foreground result of one pwsh call (the `output.schema` value shape). */
 interface PwshForegroundResult {
@@ -87,7 +107,7 @@ function validatePwshArgs(args: PwshToolArgs): void {
   if (args.command.trim().length === 0) {
     throw new Error('invalid command: expected a non-empty string')
   }
-  if (args.description.trim().length === 0) {
+  if (args.description !== undefined && args.description.trim().length === 0) {
     throw new Error('invalid description: expected a non-empty string')
   }
   if (args.timeoutMs !== undefined && (!Number.isFinite(args.timeoutMs) || args.timeoutMs <= 0)) {
@@ -104,6 +124,7 @@ function pwshDescription(backgroundEnabled: boolean, escalationModes: readonly S
     ? 'Set `run_in_background: true` for long-running commands: the call returns a job id immediately; read its output with `job_output` and stop it with `job_kill`.'
     : 'Background execution is not available; long-running commands must finish within the timeout.'
   const base = 'Execute a PowerShell command (`pwsh -Command`) and return its stdout/stderr. '
+    + 'Always pass `command` as the string `pwsh -Command` runs; `description` is optional UI copy and is never executed. '
     + 'Each call runs in a fresh pwsh process: no state (cwd, variables, functions) persists between calls — '
     + 'pass `workdir` instead of using `cd`. Paths use native Windows form (`C:\\...`); read environment '
     + 'variables with `$env:NAME`. Non-zero exits are reported as `[exit code: N]`. '
@@ -255,9 +276,8 @@ export function apply(ctx: Context, config: Config = {}): void {
       command: { type: 'string', required: true, description: 'The PowerShell command to execute.' },
       description: {
         type: 'string',
-        required: true,
-        description: 'Clear, concise description of what this command does in active voice, '
-          + '5-10 words (shown in the UI). Examples: "ls" → "List files in current directory"; '
+        description: 'Optional UI label in active voice, 5-10 words. Omit when the command is self-explanatory; '
+          + 'the UI then uses `command`. Examples: "ls" → "List files in current directory"; '
           + '"git status" → "Show working tree status"; "Get-Process" → "List running processes".',
       },
       timeoutMs: { type: 'number', description: 'Timeout in milliseconds. The executor applies its configured default and cap, and kills the command on expiry.' },
@@ -404,23 +424,30 @@ export function apply(ctx: Context, config: Config = {}): void {
       return canonicalPwshResult(result)
     },
     /* jscpd:ignore-end */
+    finalizeContent(_exec, result) {
+      const block = result.content[0]
+      if (!result.isError || block?.type !== 'text') return undefined
+      if (!block.text.includes('missing required property "command"')) return undefined
+      return [{ type: 'text', text: MISSING_COMMAND_CONTENT }]
+    },
     /* jscpd:ignore-start -- the background call card mirrors presentBashCall's by design (Agent Note). */
     presentCall: (args: PwshToolArgs): TerminalCallView | GenericCallView => {
       // Background acknowledgements carry no terminal exit status; the generic
       // card mirrors the bash tool's background presentation.
+      const label = displayLabel(args)
       if (args.run_in_background === true) {
         return {
           card: 'generic',
           title: args.command,
           kind: 'execute',
           rawInput: args.command,
-          content: [{ type: 'text', text: args.description }],
+          content: [{ type: 'text', text: label }],
         }
       }
       return {
         card: 'terminal',
         title: args.command,
-        description: args.description,
+        description: label,
         ...args.workdir !== undefined ? { cwd: args.workdir } : {},
       }
     },

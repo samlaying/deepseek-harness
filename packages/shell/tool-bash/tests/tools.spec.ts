@@ -248,6 +248,13 @@ describe('bash tool', () => {
     expect(text(result)).toBe('hello\n')
   })
 
+  it('runs when description is omitted', async () => {
+    const ctx = await setup()
+    const result = await call(ctx, 'bash', { command: 'echo hello' })
+    expect(result.isError).toBe(false)
+    expect(text(result)).toBe('hello\n')
+  })
+
   it('reports (no output) for silent commands', async () => {
     const ctx = await setup()
     const result = await call(ctx, 'bash', { command: 'true', description: 'test command' })
@@ -336,8 +343,8 @@ describe('bash tool', () => {
   // (defineTool validates against the ParameterSchemaSpec — the arg-validation Agent Note) before execute.
   it.each([
     [{}, /missing required property "command"/],
+    [{ description: 'List files' }, /missing required property "command"/],
     [{ command: 42, description: 'd' }, /"command" must be a string/],
-    [{ command: 'x' }, /missing required property "description"/],
     [{ command: 'x', description: 7 }, /"description" must be a string/],
     [{ command: 'x', description: 'd', timeoutMs: 'soon' }, /"timeoutMs" must be a number/],
     [{ command: 'x', description: 'd', workdir: 7 }, /"workdir" must be a string/],
@@ -347,6 +354,14 @@ describe('bash tool', () => {
     const result = await call(ctx, 'bash', args)
     expect(result.isError).toBe(true)
     expect(text(result)).toMatch(pattern)
+  })
+
+  it('tells the model that description is not the executed string when command is missing', async () => {
+    const ctx = await setup()
+    const result = await call(ctx, 'bash', { description: 'Correct ui-pm-workbench test deps' })
+    expect(result.isError).toBe(true)
+    expect(text(result)).toContain('`command` is the shell string that runs')
+    expect(text(result)).toContain('Do not retry with only `description`')
   })
 
   // Value constraints the ParameterSchemaSpec can't express stay in the tool body.
@@ -377,7 +392,7 @@ describe('bash tool', () => {
     const bashSchema = schemas[0]!
     expect(bashSchema.parameters).toMatchObject({
       type: 'object',
-      required: ['command', 'description'],
+      required: ['command'],
     })
     expect(Object.keys(bashSchema.parameters.properties as Record<string, unknown>))
       .toContain('run_in_background')
@@ -1060,11 +1075,17 @@ describe('tool-owned UI presentation (presentCall / presentResult)', () => {
     })).toBeUndefined()
   })
 
-  it('presentCall validates softly: malformed args (missing required description) return undefined, never throw', async () => {
+  it('presentCall uses command as the UI label when description is omitted', async () => {
+    const ctx = await setup()
+    expect(ctx.tools.get('bash')?.presentCall?.({ command: 'ls' }))
+      .toEqual({ card: 'terminal', title: 'ls', description: 'ls' })
+  })
+
+  it('presentCall validates softly: malformed args (missing required command) return undefined, never throw', async () => {
     const ctx = await setup()
     // `defineTool` soft-validates replayed logged args before presentation. Invalid shapes return
     // undefined for generic UI rendering rather than throwing; `presentCall` accepts `unknown`.
-    expect(ctx.tools.get('bash')?.presentCall?.({ command: 'ls' })).toBeUndefined()
+    expect(ctx.tools.get('bash')?.presentCall?.({ description: 'List files' })).toBeUndefined()
   })
 })
 

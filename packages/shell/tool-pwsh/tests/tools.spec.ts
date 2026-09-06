@@ -354,7 +354,7 @@ describe('registration', () => {
       workdir: { type: 'string' },
       run_in_background: { type: 'boolean' },
     })
-    expect(schema?.parameters.required).toEqual(['command', 'description'])
+    expect(schema?.parameters.required).toEqual(['command'])
     const prompt = renderPrompt(await ctx.systemPrompt.assemble())
     expect(prompt).toContain('Non-zero exits are reported as `[exit code: N]` markers')
     expect(prompt).toContain('without a signal marker')
@@ -388,6 +388,22 @@ describe('argument validation', () => {
     expect(text(await call(ctx, 'pwsh', { command: 'Write-Output hi', description: ' ' }))).toContain('expected a non-empty string')
     expect(text(await call(ctx, 'pwsh', { command: 'Write-Output hi', description: 'd', timeoutMs: -1 })))
       .toContain('invalid timeoutMs: expected a positive number')
+  })
+
+  it('runs when description is omitted', async () => {
+    const { ctx, bash } = await setup()
+    bash.handler = () => runResult('hi\n')
+    const result = await call(ctx, 'pwsh', { command: 'Write-Output hi' })
+    expect(result.isError).toBe(false)
+    expect(text(result)).toBe('hi\n')
+  })
+
+  it('tells the model that description is not the executed string when command is missing', async () => {
+    const { ctx } = await setup()
+    const result = await call(ctx, 'pwsh', { description: 'List running processes' })
+    expect(result.isError).toBe(true)
+    expect(text(result)).toContain('`command` is the shell string that runs')
+    expect(text(result)).toContain('Do not retry with only `description`')
   })
 })
 
@@ -878,6 +894,8 @@ describe('UI presentation', () => {
       .toEqual({ card: 'terminal', title: 'Get-Process', description: 'List processes' })
     expect(definition?.presentCall?.({ command: 'Get-Process', description: 'List processes', workdir: 'C:\\work' }))
       .toMatchObject({ cwd: 'C:\\work' })
+    expect(definition?.presentCall?.({ command: 'Get-Process' }))
+      .toEqual({ card: 'terminal', title: 'Get-Process', description: 'Get-Process' })
   })
 
   it('a background pending call renders the generic card like the bash tool', async () => {
