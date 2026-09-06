@@ -11,6 +11,7 @@ import { z as zod } from 'zod'
 import type { ZodType } from 'zod'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import type {} from '@deepseek-ai/dsh-agent'
+import type {} from '@deepseek-ai/dsh-llm'
 import { createUserMessage } from '@deepseek-ai/dsh-llm'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import type {} from '@deepseek-ai/dsh-session-projection'
@@ -20,6 +21,7 @@ import {
   loadBoard, readCurrentProject, selectProject, upsertCard, folderOf, PM_PROJECT_BOARD,
 } from './board.ts'
 import { PM_CARD_KINDS, type PmBoardSnapshot } from './types.ts'
+import { registerAgentRouter } from './agent-router.ts'
 
 export type * from './types.ts'
 
@@ -40,7 +42,7 @@ export function ignorePmWatchError(): void {}
 /** Cordis plugin name. */
 export const name = 'pm-workbench'
 /** Services required by the board tools, projection, and prompt index. */
-export const inject = ['agents', 'tools', 'sessionProjections', 'systemPrompt']
+export const inject = ['agents', 'tools', 'sessionProjections', 'systemPrompt', 'llm']
 
 const CARD_SCHEMA = {
   type: 'object',
@@ -161,6 +163,9 @@ function renderBoard(snapshot: {
  * @param ctx - host context carrying agents, tools, projections, and prompts.
  */
 export function apply(ctx: Context): void {
+  // Register intelligent agent router for automated skill routing and memory updates
+  registerAgentRouter(ctx)
+
   ctx.sessionProjections.register<'pmWorkbench', PmBoardSnapshot | null>({
     key: 'pmWorkbench',
     stateSchema: boardProjectionSchema,
