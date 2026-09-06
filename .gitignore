@@ -1,5 +1,6 @@
 CLAUDE.local.md
 .env
+.feishu.local
 node_modules/
 lib/
 *.tsbuildinfo

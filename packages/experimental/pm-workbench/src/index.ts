@@ -364,12 +364,32 @@ export function apply(ctx: Context): void {
    * Upload markdown content to Feishu document
    */
   async function uploadToFeishu(title: string, markdown: string): Promise<string> {
-    // 从环境变量获取飞书配置
-    const appId = process.env.FEISHU_APP_ID
-    const appSecret = process.env.FEISHU_APP_SECRET
+    // 尝试从本地配置文件读取飞书配置（优先级最高，避免上传到git）
+    let appId = process.env.FEISHU_APP_ID
+    let appSecret = process.env.FEISHU_APP_SECRET
+
+    try {
+      const { readFile } = await import('node:fs/promises')
+      const { join } = await import('node:path')
+      const configPath = join(process.cwd(), '.feishu.local')
+      const configContent = await readFile(configPath, 'utf8')
+
+      // 解析配置文件
+      for (const line of configContent.split('\n')) {
+        const trimmed = line.trim()
+        if (trimmed.startsWith('FEISHU_APP_ID=')) {
+          appId = trimmed.replace('FEISHU_APP_ID=', '').trim()
+        }
+        if (trimmed.startsWith('FEISHU_APP_SECRET=')) {
+          appSecret = trimmed.replace('FEISHU_APP_SECRET=', '').trim()
+        }
+      }
+    } catch {
+      // 配置文件不存在，使用环境变量（已在上面赋值）
+    }
 
     if (!appId || !appSecret) {
-      throw new Error('缺少飞书配置：请设置 FEISHU_APP_ID 和 FEISHU_APP_SECRET 环境变量')
+      throw new Error('缺少飞书配置：请在 .feishu.local 文件或环境变量中设置 FEISHU_APP_ID 和 FEISHU_APP_SECRET')
     }
 
     // 1. 获取 tenant_access_token
