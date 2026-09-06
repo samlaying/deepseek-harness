@@ -69,11 +69,18 @@ describe('PmWorkbenchView', () => {
       openProject,
       saveCard,
     })
+    expect(screen.container.querySelector('[data-conversation-composer-overlay]')).toBeTruthy()
     expect(screen.getByText('PRD')).toBeTruthy()
     expect(screen.getByText('Hello')).toBeTruthy()
     expect(screen.getByText('Live')).toBeTruthy()
     expect(screen.getByText('Two')).toBeTruthy()
     expect(screen.getByText('Three')).toBeTruthy()
+    const toggleBtn = screen.getByLabelText(en['projects.toggle'])
+    expect(toggleBtn).toBeTruthy()
+    fireEvent.click(toggleBtn)
+    expect(screen.getByLabelText(en['projects.expand'])).toBeTruthy()
+    fireEvent.click(screen.getByLabelText(en['projects.expand']))
+    expect(screen.getByLabelText(en['projects.toggle'])).toBeTruthy()
     fireEvent.click(screen.getByText(en['projects.open']))
     await vi.waitFor(() => {
       expect(openProject).toHaveBeenCalledWith('/abs/shop')

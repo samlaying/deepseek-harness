@@ -80,12 +80,12 @@ function CardPanel({
     if (mode === 'preview') setDraft(card.markdown)
   }, [card.markdown, mode])
   return h('section', {
-    className: css.panel,
+    className: `${css.panel} ${css[card.kind]}`,
     style: { left: card.x, top: card.y, width: card.width, height: card.height },
   },
   h('div', { className: css.bar },
     h('div', null,
-      h('div', null, card.title),
+      h('div', { className: css.title }, card.title),
       h('div', { className: css.kind }, t(KIND_KEY[card.kind])),
     ),
     h('div', { className: css.actions },
@@ -122,7 +122,8 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
   const live = useChat((snapshot: ChatSnapshot) => snapshot.legacy.partial)
   const nodes = useChat((snapshot: ChatSnapshot) => snapshot.legacy.nodes)
   const [error, setError] = useState<string | null>(null)
-  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [leftCollapsed, setLeftCollapsed] = useState(false)
+  const [pan, setPan] = useState({ x: 120, y: 80 })
   const drag = useRef<{ pointer: number; x: number; y: number; panX: number; panY: number } | null>(null)
   const liveText = useMemo(() => (live === null ? '' : blocksText(live.blocks)), [live])
 
@@ -145,95 +146,107 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
   const projects = board?.projects ?? []
   const folders = board?.folders ?? {}
 
-  return h('div', { className: css.root },
-    h('aside', { className: css.left, 'aria-label': t('projects.title') },
-      h('h2', { className: css.heading }, t('projects.title')),
-      h('div', { className: css.row },
-        h('button', { type: 'button', onClick: () => void bind() }, t('projects.open')),
-      ),
-      error === null ? null : h('p', { className: css.hint }, error),
-      projects.length === 0
-        ? h('p', { className: css.empty }, t('projects.empty'))
-        : h('div', { className: css.list },
-          projects.map(projectId => h('button', {
-            key: projectId,
-            type: 'button',
-            className: projectId === board?.projectId ? css.active : css.project,
-            onClick: () => void open(projectId),
-          }, folders[projectId] ?? projectId)),
-        ),
+  return h('div', {
+    className: `${css.root} ${leftCollapsed ? css.leftCollapsed : ''}`,
+    'data-conversation-composer-overlay': '',
+  },
+  h('aside', { className: css.left, 'aria-label': t('projects.title') },
+    h('div', { className: css.leftHeader },
+      leftCollapsed ? null : h('h2', { className: css.heading }, t('projects.title')),
+      h('button', {
+        type: 'button',
+        className: css.toggleButton,
+        onClick: () => setLeftCollapsed(!leftCollapsed),
+        title: leftCollapsed ? t('projects.expand') : t('projects.toggle'),
+        'aria-label': leftCollapsed ? t('projects.expand') : t('projects.toggle'),
+      }, leftCollapsed ? '›' : '‹'),
     ),
-    h('section', { className: css.mid, 'aria-label': t('chat.title') },
-      h('h2', { className: css.heading }, t('chat.title')),
-      h('div', { className: css.stream },
-        nodes.length === 0 && liveText === ''
-          ? h('p', { className: css.empty }, t('chat.empty'))
-          : null,
-        nodes.map((node, index) => {
-          if (node.kind === 'user') {
-            const text = node.content
-              .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
-              .map(block => block.text)
-              .join('\n')
-            return h('p', { key: `u-${index}`, className: `${css.bubble} ${css.user}` }, text)
-          }
-          if (node.kind === 'assistant') {
-            return h('p', { key: `a-${index}`, className: `${css.bubble} ${css.assistant}` }, blocksText(node.blocks))
-          }
-          return null
-        }),
-        liveText === '' ? null : h('p', { className: `${css.bubble} ${css.assistant}` }, liveText),
-      ),
+    leftCollapsed ? null : h('div', { className: css.row },
+      h('button', { type: 'button', onClick: () => void bind() }, t('projects.open')),
     ),
-    h('aside', { className: css.right, 'aria-label': t('canvas.title') },
-      h('div', {
-        className: css.canvas,
-        onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
-          if (event.button !== 0) return
-          const target = event.target
-          if (!(target instanceof Element) || target.closest('button, textarea, input, section')) return
-          drag.current = {
-            pointer: event.pointerId,
-            x: event.clientX,
-            y: event.clientY,
-            panX: pan.x,
-            panY: pan.y,
-          }
-          event.currentTarget.setPointerCapture(event.pointerId)
-        },
-        onPointerMove: (event: PointerEvent<HTMLDivElement>) => {
-          const start = drag.current
-          if (start === null || start.pointer !== event.pointerId) return
-          setPan({
-            x: start.panX + event.clientX - start.x,
-            y: start.panY + event.clientY - start.y,
-          })
-        },
-        onPointerUp: (event: PointerEvent<HTMLDivElement>) => {
-          if (drag.current?.pointer === event.pointerId) drag.current = null
-        },
+    leftCollapsed ? null : (error === null ? null : h('p', { className: css.hint }, error)),
+    leftCollapsed ? null : (projects.length === 0
+      ? h('p', { className: css.empty }, t('projects.empty'))
+      : h('div', { className: css.list },
+        projects.map(projectId => h('button', {
+          key: projectId,
+          type: 'button',
+          className: projectId === board?.projectId ? css.active : css.project,
+          onClick: () => void open(projectId),
+        }, folders[projectId] ?? projectId)),
+      )),
+  ),
+  h('section', { className: css.mid, 'aria-label': t('chat.title') },
+    h('h2', { className: css.heading }, t('chat.title')),
+    h('div', { className: css.stream },
+      nodes.length === 0 && liveText === ''
+        ? h('p', { className: css.empty }, t('chat.empty'))
+        : null,
+      nodes.map((node, index) => {
+        if (node.kind === 'user') {
+          const text = node.content
+            .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
+            .map(block => block.text)
+            .join('\n')
+          return h('p', { key: `u-${index}`, className: `${css.bubble} ${css.user}` }, text)
+        }
+        if (node.kind === 'assistant') {
+          return h('p', { key: `a-${index}`, className: `${css.bubble} ${css.assistant}` }, blocksText(node.blocks))
+        }
+        return null
+      }),
+      liveText === '' ? null : h('p', { className: `${css.bubble} ${css.assistant}` }, liveText),
+    ),
+  ),
+  h('aside', { className: css.right, 'aria-label': t('canvas.title') },
+    h('div', {
+      className: css.canvas,
+      onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
+        if (event.button !== 0) return
+        const target = event.target
+        if (!(target instanceof Element) || target.closest('button, textarea, input, section')) return
+        drag.current = {
+          pointer: event.pointerId,
+          x: event.clientX,
+          y: event.clientY,
+          panX: pan.x,
+          panY: pan.y,
+        }
+        event.currentTarget.setPointerCapture(event.pointerId)
       },
-      h('div', { className: css.surface, style: { transform: `translate(${pan.x}px, ${pan.y}px)` } },
-        board == null || (board.cards.length === 0 && liveText === '')
-          ? h('p', { className: css.empty, style: { position: 'absolute', left: 48, top: 44 } }, t('canvas.empty'))
-          : null,
-        liveText === '' || board == null ? null : h('section', {
-          className: css.panel,
-          style: { left: 980, top: 44, width: 440, height: 280 },
+      onPointerMove: (event: PointerEvent<HTMLDivElement>) => {
+        const start = drag.current
+        if (start === null || start.pointer !== event.pointerId) return
+        setPan({
+          x: start.panX + event.clientX - start.x,
+          y: start.panY + event.clientY - start.y,
+        })
+      },
+      onPointerUp: (event: PointerEvent<HTMLDivElement>) => {
+        if (drag.current?.pointer === event.pointerId) drag.current = null
+      },
+    },
+    h('div', { className: css.surface, style: { transform: `translate(${pan.x}px, ${pan.y}px)` } },
+      board == null || (board.cards.length === 0 && liveText === '')
+        ? h('p', { className: css.empty, style: { position: 'absolute', left: 48, top: 44 } }, t('canvas.empty'))
+        : null,
+      liveText === '' || board == null ? null : h('section', {
+        className: `${css.panel} ${css.live}`,
+        style: { left: 980, top: 44, width: 440, height: 280 },
+      },
+      h('div', { className: css.bar }, h('div', null, t('canvas.live'))),
+      h('div', { className: css.body }, previewMarkdown(liveText)),
+      ),
+      board == null ? null : board.cards.map(card => h(CardPanel, {
+        key: card.id,
+        card,
+        t,
+        onSave: (markdown) => {
+          void saveCard({ ...card, projectId: board.projectId, markdown }).then(setError)
         },
-        h('div', { className: css.bar }, h('div', null, t('canvas.live'))),
-        h('div', { className: css.body }, previewMarkdown(liveText)),
-        ),
-        board == null ? null : board.cards.map(card => h(CardPanel, {
-          key: card.id,
-          card,
-          t,
-          onSave: (markdown) => {
-            void saveCard({ ...card, projectId: board.projectId, markdown }).then(setError)
-          },
-        })),
-      ),
-      ),
+      })),
     ),
+    ),
+  ),
   )
 }
