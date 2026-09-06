@@ -75,7 +75,7 @@ function CardPanel({
   onSave: (markdown: string) => void
   onMove: (x: number, y: number) => void
 }) {
-  const [mode, setMode] = useState<'preview' | 'edit'>('preview')
+  const [mode, setMode] = useState<'preview' | 'edit'>('edit')
   const [draft, setDraft] = useState(card.markdown)
   const dragRef = useRef<{ pointer: number; startX: number; startY: number; cardX: number; cardY: number } | null>(null)
 
