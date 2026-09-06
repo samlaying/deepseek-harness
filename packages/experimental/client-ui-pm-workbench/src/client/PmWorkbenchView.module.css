@@ -209,6 +209,25 @@
   background-size: 40px 40px;
 }
 
+/* PM Workbench owns the complete viewport while its view is active. */
+:global(body[data-pm-workbench-standalone='true']) :global([data-shell-frame]) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+:global(body[data-pm-workbench-standalone='true']) :global([data-shell-sidebar]),
+:global(body[data-pm-workbench-standalone='true']) :global([data-shell-details]),
+:global(body[data-pm-workbench-standalone='true']) :global([data-shell-frame]) > :global([data-shell-overlay]) {
+  display: none !important;
+}
+
+:global(body[data-pm-workbench-standalone='true']) :global([data-shell-center]) {
+  grid-column: 1;
+}
+
+:global(body[data-pm-workbench-standalone='true']) :global([data-shell-center]:has([data-conversation-composer-overlay])) :global([class*='_header_']) {
+  display: none !important;
+}
+
 .canvas:active {
   cursor: grabbing;
 }

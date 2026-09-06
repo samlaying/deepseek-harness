@@ -127,6 +127,11 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
   const drag = useRef<{ pointer: number; x: number; y: number; panX: number; panY: number } | null>(null)
   const liveText = useMemo(() => (live === null ? '' : blocksText(live.blocks)), [live])
 
+  useEffect(() => {
+    document.body.dataset.pmWorkbenchStandalone = 'true'
+    return () => { delete document.body.dataset.pmWorkbenchStandalone }
+  }, [])
+
   const bind = async () => {
     let folder: string | null
     try {

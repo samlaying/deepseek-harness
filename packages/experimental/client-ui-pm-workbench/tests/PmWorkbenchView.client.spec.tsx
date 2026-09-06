@@ -103,6 +103,7 @@ describe('PmWorkbenchView', () => {
     fireEvent.pointerUp(canvas, { pointerId: 9 })
     fireEvent.pointerUp(canvas, { pointerId: 1 })
     fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 80, clientY: 80 })
+    expect(document.body.dataset.pmWorkbenchStandalone).toBe('true')
   })
 
   it('shows empty copy, bind-folder errors, and assistant plus heading preview', async () => {
