@@ -184,14 +184,28 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
         : null,
       nodes.map((node, index) => {
         if (node.kind === 'user') {
-          const text = node.content
+          const blocks = node.content
             .filter((block): block is { type: 'text'; text: string } => block.type === 'text')
             .map(block => block.text)
-            .join('\n')
+          // Deduplicate consecutive identical blocks
+          const deduplicated = blocks.filter((text, i) => i === 0 || text !== blocks[i - 1])
+          let text = deduplicated.join('\n')
+          // Truncate pathologically long text to first sentence
+          if (text.length > 500) {
+            const firstSentence = text.match(/^[^。！？.!?]+[。！？.!?]/)
+            if (firstSentence) {
+              text = firstSentence[0]
+            } else {
+              text = text.substring(0, 200) + '...'
+            }
+          }
+          if (text === '') return null
           return h('p', { key: `u-${index}`, className: `${css.bubble} ${css.user}` }, text)
         }
         if (node.kind === 'assistant') {
-          return h('p', { key: `a-${index}`, className: `${css.bubble} ${css.assistant}` }, blocksText(node.blocks))
+          const text = blocksText(node.blocks)
+          if (text === '') return null
+          return h('p', { key: `a-${index}`, className: `${css.bubble} ${css.assistant}` }, text)
         }
         return null
       }),
