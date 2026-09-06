@@ -3,8 +3,8 @@
  * from a source edit. Reload signaling is not this script's business — the host
  * webserver stat-polls the bundles it serves and broadcasts `rebuilt` frames
  * itself (`dsh web`), so any process that rewrites `lib/client.js` files
- * triggers reloads; this script is merely the convenient way to keep them all
- * rebuilt on source change.
+ * triggers reloads. The same command also starts the local `dsh web` host so
+ * the browser never runs without its RPC server.
  *
  * Three stages, because the compile shell links built lib products rather than
  * sources: `tsc -b tsconfig.client.json` emits `lib/types` (the tsdown lib
@@ -47,6 +47,9 @@ const CLIENT_TYPE_PROGRAM = 'tsconfig.client.json'
 
 /** Compile-shell workspace whose dist `dsh web` serves. */
 const SHELL_PACKAGE = '@deepseek-ai/dsh-web-frontend'
+
+/** Fixed local development port used by the PM Workbench browser entry. */
+const DEV_WEB_PORT = '4318'
 
 /**
  * Test infrastructure builds through the client preset but never enters the
@@ -255,6 +258,7 @@ if (isMain) {
   // running vite from anywhere but apps/web silently switches which react copy
   // the bundle gets.
   spawnStage('vite build --watch', 'pnpm', ['--filter', SHELL_PACKAGE, 'run', 'watch'], false)
+  spawnStage('dsh web', 'pnpm', ['dsh', 'web', '--port', DEV_WEB_PORT, '--no-open'], false)
 
   console.log(
     `dev-web: watching ${String(pluginDirs.length)} dsh.client plugin packages`

@@ -367,6 +367,7 @@ export function apply(ctx: Context): void {
     // 尝试从本地配置文件读取飞书配置（优先级最高，避免上传到git）
     let appId = process.env.FEISHU_APP_ID
     let appSecret = process.env.FEISHU_APP_SECRET
+    let proxy = process.env.FEISHU_PROXY
 
     try {
       const { readFile } = await import('node:fs/promises')
@@ -383,9 +384,26 @@ export function apply(ctx: Context): void {
         if (trimmed.startsWith('FEISHU_APP_SECRET=')) {
           appSecret = trimmed.replace('FEISHU_APP_SECRET=', '').trim()
         }
+        if (trimmed.startsWith('FEISHU_PROXY=')) {
+          proxy = trimmed.replace('FEISHU_PROXY=', '').trim()
+        }
       }
     } catch {
       // 配置文件不存在，使用环境变量（已在上面赋值）
+    }
+
+    const { fetch: proxyFetch, ProxyAgent } = await import('undici')
+    const dispatcher = proxy ? new ProxyAgent(proxy) : undefined
+
+    const fetchFeishu = async (
+      url: string,
+      init: Parameters<typeof proxyFetch>[1],
+    ): Promise<Awaited<ReturnType<typeof proxyFetch>>> => {
+      try {
+        return await proxyFetch(url, dispatcher ? { ...init, dispatcher } : init)
+      } catch (error) {
+        throw new Error(`访问飞书失败${proxy ? `（代理 ${proxy}）` : ''}：${String(error)}`, { cause: error })
+      }
     }
 
     if (!appId || !appSecret) {
@@ -393,7 +411,7 @@ export function apply(ctx: Context): void {
     }
 
     // 1. 获取 tenant_access_token
-    const tokenResponse = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+    const tokenResponse = await fetchFeishu('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ app_id: appId, app_secret: appSecret }),
@@ -407,7 +425,7 @@ export function apply(ctx: Context): void {
     const token = tokenData.tenant_access_token
 
     // 2. 创建飞书文档
-    const createDocResponse = await fetch('https://open.feishu.cn/open-apis/docx/v1/documents', {
+    const createDocResponse = await fetchFeishu('https://open.feishu.cn/open-apis/docx/v1/documents', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -449,7 +467,7 @@ export function apply(ctx: Context): void {
       },
     }))
 
-    await fetch(`https://open.feishu.cn/open-apis/docx/v1/documents/${documentId}/blocks/batch_update`, {
+    await fetchFeishu(`https://open.feishu.cn/open-apis/docx/v1/documents/${documentId}/blocks/batch_update`, {
       method: 'PATCH',
       headers: {
         'Authorization': `Bearer ${token}`,

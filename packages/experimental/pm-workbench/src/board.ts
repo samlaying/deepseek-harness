@@ -1,6 +1,6 @@
 /** Bound project folders and the markdown canvas stored inside each one. */
 
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import { basename, isAbsolute, join, resolve } from 'node:path'
 import { PM_CARD_KINDS, type PmBoardSnapshot, type PmCard, type PmCardKind } from './types.ts'
 
@@ -86,7 +86,14 @@ async function readBindings(cwd: string): Promise<BindingsFile> {
 
 async function writeBindings(cwd: string, bindings: BindingsFile): Promise<void> {
   await mkdir(indexDir(cwd), { recursive: true })
-  await writeFile(join(indexDir(cwd), BINDINGS), `${JSON.stringify(bindings, null, 2)}\n`, 'utf8')
+  await writeJsonAtomic(join(indexDir(cwd), BINDINGS), bindings)
+}
+
+/** Write a JSON document through a same-directory rename so readers never see a partial file. */
+async function writeJsonAtomic(path: string, value: unknown): Promise<void> {
+  const temporary = `${path}.${process.pid}.${Date.now()}.tmp`
+  await writeFile(temporary, `${JSON.stringify(value, null, 2)}\n`, 'utf8')
+  await rename(temporary, path)
 }
 
 function uniqueId(bindings: BindingsFile, folder: string): string {
@@ -303,8 +310,8 @@ export async function upsertCard(cwd: string, input: {
     ? [...previous.cards, card]
     : previous.cards.map(item => item.id === id ? card : item)
   await writeFile(join(dir, 'cards', `${id}.md`), input.markdown, 'utf8')
-  await writeFile(join(dir, 'layout.json'), `${JSON.stringify({
+  await writeJsonAtomic(join(dir, 'layout.json'), {
     cards: cards.map(({ markdown: _markdown, ...layout }) => layout),
-  }, null, 2)}\n`, 'utf8')
+  })
   return await snapshotOf(cwd, projectId, cards)
 }

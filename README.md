@@ -56,6 +56,10 @@ Start with the [development guide](docs/development.md) and [architecture docume
 
 For agents, follow [AGENTS.md](AGENTS.md).
 
+For local web development, run `pnpm run build` once, then run `pnpm run dev:web`.
+That command watches client changes and starts the RPC host at
+`http://127.0.0.1:4318`.
+
 ## License
 
 [MIT](LICENSE)

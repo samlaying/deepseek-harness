@@ -77,6 +77,9 @@ pnpm dsh web
 
 面向 agent：请遵循 [AGENTS.md](AGENTS.md)。
 
+本地开发 Web 界面时，先运行一次 `pnpm run build`，之后运行 `pnpm run dev:web`。
+该命令会监听客户端改动，并在 `http://127.0.0.1:4318` 启动 RPC 服务。
+
 ## 许可证
 
 [MIT](LICENSE)

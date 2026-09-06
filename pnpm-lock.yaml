@@ -4885,6 +4885,9 @@ importers:
 
   packages/experimental/pm-workbench:
     dependencies:
+      undici:
+        specifier: ^8.10.0
+        version: 8.10.0
       zod:
         specifier: ^4.4.3
         version: 4.4.3
