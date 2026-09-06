@@ -1,0 +1,6 @@
+# Private PM Workbench host layer. Apply after dsh-base so the model can
+# open a shared project board and write markdown cards onto it.
+
+- insert:
+    - id: pm-workbench
+      name: '@deepseek-ai/dsh-experimental-pm-workbench'

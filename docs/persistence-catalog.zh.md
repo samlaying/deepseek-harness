@@ -559,6 +559,22 @@ export type SessionEvent<T extends SessionEventType = SessionEventType> = {
 
 来源：[`packages/plan/plan-mode/src/index.ts:46`](../packages/plan/plan-mode/src/index.ts)
 
+### `pm-workbench/*`
+
+<a id="pm-workbenchboard--log-only"></a>
+
+#### `pm-workbench/board` — log-only
+
+```ts persistence-catalog
+/**
+ * Whole project-board snapshot. Latest write wins on replay. Log-only UI
+ * state; never derived history. Disk files remain the shared source.
+ */
+'pm-workbench/board': PmBoardSnapshot
+```
+
+来源：[`packages/experimental/pm-workbench/src/types.ts:40`](../packages/experimental/pm-workbench/src/types.ts)
+
 ### `request/*`
 
 <a id="requestcontext--log-only"></a>
