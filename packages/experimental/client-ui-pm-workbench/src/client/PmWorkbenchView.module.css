@@ -52,6 +52,7 @@
   border-right: 1px solid var(--pm-line);
   backdrop-filter: blur(18px);
   transition: padding 0.2s ease;
+  overflow: hidden;
 }
 
 .leftCollapsed .left {
@@ -164,10 +165,13 @@
 
 .stream {
   flex: 1;
-  overflow: auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  padding-top: 0;
 }
 
 .bubble {
