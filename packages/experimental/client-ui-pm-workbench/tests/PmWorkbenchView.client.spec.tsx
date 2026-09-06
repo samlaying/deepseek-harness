@@ -10,6 +10,8 @@ import { en, type PmWorkbenchKey } from '../src/client/locales.ts'
 
 afterEach(cleanup)
 
+HTMLElement.prototype.setPointerCapture = () => undefined
+
 const board: PmBoardSnapshot = {
   projectId: 'shop',
   folder: '/abs/shop',
@@ -71,7 +73,7 @@ describe('PmWorkbenchView', () => {
     })
     expect(screen.container.querySelector('[data-conversation-composer-overlay]')).toBeTruthy()
     expect(screen.getByText('PRD')).toBeTruthy()
-    expect(screen.getByText('Hello')).toBeTruthy()
+    expect(screen.getByRole('textbox').textContent).toContain('Hello')
     expect(screen.getByText('Live')).toBeTruthy()
     expect(screen.getByText('Two')).toBeTruthy()
     expect(screen.getByText('Three')).toBeTruthy()
@@ -89,12 +91,13 @@ describe('PmWorkbenchView', () => {
     expect(openProject).toHaveBeenCalledWith('ghost')
     fireEvent.click(screen.getByText('/abs/other'))
     expect(openProject).toHaveBeenCalledWith('other')
-    fireEvent.click(screen.getByText(en['card.edit']))
     fireEvent.change(screen.getByRole('textbox'), { target: { value: '# Edited' } })
     fireEvent.click(screen.getByText(en['card.save']))
     expect(saveCard).toHaveBeenCalledWith(expect.objectContaining({ markdown: '# Edited', projectId: 'shop' }))
     fireEvent.click(screen.getByText(en['card.preview']))
-    fireEvent.pointerDown(screen.getByText('PRD'), { button: 0, pointerId: 7, clientX: 1, clientY: 1 })
+    const cardTitle = screen.getByText('PRD') as HTMLElement
+    cardTitle.setPointerCapture = () => undefined
+    fireEvent.pointerDown(cardTitle, { button: 0, pointerId: 7, clientX: 1, clientY: 1 })
     const canvas = screen.getByLabelText(en['canvas.title']).firstElementChild as HTMLElement
     canvas.setPointerCapture = () => undefined
     fireEvent.pointerDown(canvas, { button: 0, pointerId: 1, clientX: 10, clientY: 10 })

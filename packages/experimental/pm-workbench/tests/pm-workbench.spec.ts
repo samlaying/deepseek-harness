@@ -6,7 +6,7 @@ import { Context } from '@deepseek-ai/cordis'
 import AgentRegistry, { Inbox } from '@deepseek-ai/dsh-agent'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import CommandRuntime from '@deepseek-ai/dsh-commands'
-import { ToolCallId } from '@deepseek-ai/dsh-llm'
+import LlmRuntime, { ToolCallId } from '@deepseek-ai/dsh-llm'
 import { SESSION_FORMAT_VERSION, Session, SessionId } from '@deepseek-ai/dsh-session'
 import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
 import SystemPrompt from '@deepseek-ai/dsh-system-prompt'
@@ -57,6 +57,7 @@ async function setup(dir: string, register = true): Promise<{ context: Context; 
   ctx = context
   await context.plugin(AgentRegistry)
   await context.plugin(SystemPrompt)
+  await context.plugin(LlmRuntime)
   await context.plugin(ToolRuntime)
   await context.plugin(SessionProjectionRegistry)
   await context.plugin(CommandRuntime)
@@ -312,6 +313,6 @@ describe('pm-workbench plugin', () => {
     } as Agent)
     expect(plugin.emptyPmBoard()).toBeNull()
     plugin.ignorePmWatchError()
-    expect(context.sessionProjections.stateOf(blank.session, 'pmWorkbench')).toBeNull()
+    expect(context.sessionProjections.stateOf(blank.session, 'pmWorkbench')).toBeUndefined()
   })
 })
