@@ -35,7 +35,7 @@ export interface PmWorkbenchInjected {
   /**
    * Upload card content to Feishu document.
    * @param card - card to upload.
-   * @returns document URL on success, otherwise null.
+   * @returns document URL on success, error message on failure.
    */
   uploadToFeishu: (card: { readonly title: string; readonly markdown: string }) => Promise<string | null>
 }
@@ -334,11 +334,11 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
           void saveCard({ ...card, projectId: board.projectId, x, y }).then(setError)
         },
         onUploadToFeishu: async () => {
-          const url = await uploadToFeishu({ title: card.title, markdown: card.markdown })
-          if (url) {
-            alert(`✅ 已上传到飞书！\n\n📄 ${card.title}\n🔗 ${url}`)
+          const result = await uploadToFeishu({ title: card.title, markdown: card.markdown })
+          if (result && result.startsWith('http')) {
+            alert(`✅ 已上传到飞书！\n\n📄 ${card.title}\n🔗 ${result}`)
           } else {
-            alert('❌ 上传失败，请检查飞书配置')
+            alert(`❌ 上传失败\n\n${result || '请检查飞书配置'}`)
           }
         },
       })),

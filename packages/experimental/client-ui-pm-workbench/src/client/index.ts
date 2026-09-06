@@ -58,12 +58,14 @@ export function apply(ctx: ClientContext): void {
       },
       uploadToFeishu: async (card) => {
         const result = await ctx.remote.commands.execute(sessionId, `/pm-feishu ${JSON.stringify(card)}`, [])
-        if (!result.ok) return null
-        if (result.value === undefined) return null
-        if (result.value.result.kind === 'error') return null
+        if (!result.ok) return `RPC错误: ${result.error.message}`
+        if (result.value === undefined) return '命令未找到'
+        if (result.value.result.kind === 'error') {
+          return result.value.result.text ?? '上传失败'
+        }
         // Extract URL from success message
         const match = result.value.result.text?.match(/🔗\s+(https:\/\/[^\s]+)/)
-        return match?.[1] ?? null
+        return match?.[1] ?? result.value.result.text ?? null
       },
     }),
   }, PmWorkbenchView))
