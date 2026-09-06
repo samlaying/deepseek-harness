@@ -68,36 +68,67 @@ function previewMarkdown(markdown: string): ReactNode[] {
 }
 
 function CardPanel({
-  card, t, onSave,
+  card, t, onSave, onMove,
 }: {
   card: PmCard
   t: PmWorkbenchViewProps['t']
   onSave: (markdown: string) => void
+  onMove: (x: number, y: number) => void
 }) {
   const [mode, setMode] = useState<'preview' | 'edit'>('preview')
   const [draft, setDraft] = useState(card.markdown)
+  const dragRef = useRef<{ pointer: number; startX: number; startY: number; cardX: number; cardY: number } | null>(null)
+
   useEffect(() => {
     if (mode === 'preview') setDraft(card.markdown)
   }, [card.markdown, mode])
+
   return h('section', {
     className: `${css.panel} ${css[card.kind]}`,
     style: { left: card.x, top: card.y, width: card.width, height: card.height },
   },
-  h('div', { className: css.bar },
-    h('div', null,
-      h('div', { className: css.title }, card.title),
-      h('div', { className: css.kind }, t(KIND_KEY[card.kind])),
-    ),
-    h('div', { className: css.actions },
-      h('button', {
-        type: 'button',
-        onClick: () => setMode(mode === 'preview' ? 'edit' : 'preview'),
-      }, t(mode === 'preview' ? 'card.edit' : 'card.preview')),
-      h('button', {
-        type: 'button',
-        onClick: () => onSave(draft),
-      }, t('card.save')),
-    ),
+  h('div', {
+    className: css.bar,
+    onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
+      if (event.button !== 0) return
+      const target = event.target
+      if (target instanceof Element && target.closest('button')) return
+      dragRef.current = {
+        pointer: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        cardX: card.x,
+        cardY: card.y,
+      }
+      event.currentTarget.setPointerCapture(event.pointerId)
+    },
+    onPointerMove: (event: PointerEvent<HTMLDivElement>) => {
+      const state = dragRef.current
+      if (state === null || state.pointer !== event.pointerId) return
+      const deltaX = event.clientX - state.startX
+      const deltaY = event.clientY - state.startY
+      onMove(state.cardX + deltaX, state.cardY + deltaY)
+    },
+    onPointerUp: (event: PointerEvent<HTMLDivElement>) => {
+      if (dragRef.current?.pointer === event.pointerId) {
+        dragRef.current = null
+      }
+    },
+  },
+  h('div', null,
+    h('div', { className: css.title }, card.title),
+    h('div', { className: css.kind }, t(KIND_KEY[card.kind])),
+  ),
+  h('div', { className: css.actions },
+    h('button', {
+      type: 'button',
+      onClick: () => setMode(mode === 'preview' ? 'edit' : 'preview'),
+    }, t(mode === 'preview' ? 'card.edit' : 'card.preview')),
+    h('button', {
+      type: 'button',
+      onClick: () => onSave(draft),
+    }, t('card.save')),
+  ),
   ),
   h('div', { className: css.body },
     mode === 'edit'
@@ -286,6 +317,9 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
         t,
         onSave: (markdown) => {
           void saveCard({ ...card, projectId: board.projectId, markdown }).then(setError)
+        },
+        onMove: (x, y) => {
+          void saveCard({ ...card, projectId: board.projectId, x, y }).then(setError)
         },
       })),
     ),
