@@ -10,23 +10,25 @@
  * is pinned separately in integration.spec.ts.
  */
 
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Context } from '@deepseek-ai/cordis'
-import { mkdtempSync, realpathSync } from 'node:fs'
+import { mkdtempSync, realpathSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve as resolvePath } from 'node:path'
-import { CallId } from '@deepseek-ai/dsh-llm'
+import { ToolCallId } from '@deepseek-ai/dsh-llm'
 import SystemPrompt, { renderPrompt } from '@deepseek-ai/dsh-system-prompt'
 import ToolRuntime, { TOOL_ABORTED, TOOL_ABORTED_BEFORE_DISPATCH } from '@deepseek-ai/dsh-tools'
 import LocalJobRegistry from '@deepseek-ai/dsh-jobs-local'
 import * as ToolTasks from '@deepseek-ai/dsh-tool-jobs'
 import AgentRegistry from '@deepseek-ai/dsh-agent'
 import type { Agent } from '@deepseek-ai/dsh-agent'
-import { SessionId } from '@deepseek-ai/dsh-session'
+import { SESSION_FORMAT_VERSION, SessionId, SessionLogOffset, SessionSeq } from '@deepseek-ai/dsh-session'
 import ApprovalService from '@deepseek-ai/dsh-user-approval'
 import type { ApprovalOutcome } from '@deepseek-ai/dsh-user-approval'
 import { ShellExecutor } from '@deepseek-ai/dsh-shell'
 import type { ShellExecRequest, ShellExecSpec, ShellProcess, ShellRunResult } from '@deepseek-ai/dsh-shell'
+import SessionProjectionRegistry from '@deepseek-ai/dsh-session-projection'
+import { turnBoundaryProjectionDefinition } from '@deepseek-ai/dsh-agent-loop'
 import SandboxPolicyService from '@deepseek-ai/dsh-sandbox-policy'
 import * as ToolPwsh from '@deepseek-ai/dsh-tool-pwsh'
 import * as BashEnvPlugin from '@deepseek-ai/dsh-shell-env'
@@ -35,6 +37,12 @@ import { processOutcome } from '../src/background.ts'
 import { renderPwshProcessRead, renderPwshResult } from '../src/render.ts'
 
 const testToolSignal = new AbortController().signal
+
+/** Per-test temp dirs (session cwd/home fixtures), removed after each test. */
+const tempDirs: string[] = []
+afterEach(() => {
+  for (const dir of tempDirs.splice(0)) rmSync(dir, { recursive: true, force: true })
+})
 
 /**
  * A scriptable fake executor: `resolve()` mirrors the real defaulting, `run()`
@@ -210,6 +218,11 @@ async function setupSandboxed(withApproval = false) {
   await ctx.plugin(LocalJobRegistry)
   await ctx.plugin(ToolTasks)
   await ctx.plugin(BashEnvPlugin)
+  await ctx.plugin(SessionProjectionRegistry)
+  // The loop's turnBoundary unit (the open-turn fold) is not mounted in this
+  // bench — the loop itself is not composed. Register its open-turn fold so
+  // the approval service's turn-enclosure gate reads the seeded log shape.
+  ctx.sessionProjections.register(turnBoundaryProjectionDefinition)
   await ctx.plugin(SandboxPolicyService, {})
   await ctx.plugin(ConfiningFakeBash)
   if (withApproval) await ctx.plugin(ApprovalService)
@@ -229,18 +242,39 @@ function sandboxAgent(
   ctx?: Context,
   onAppend?: (type: string) => void,
 ): Agent {
-  const events: Array<{ type: string; data?: Record<string, unknown> }> = [{ type: 'turn/start' }]
-  if (mode !== undefined) events.push({ type: 'sandbox/mode', data: { mode } })
+  const events: Array<{
+    type: string
+    seq: ReturnType<typeof SessionSeq>
+    time: number
+    data: Record<string, unknown>
+  }> = [
+    { type: 'turn/start', seq: SessionSeq(0), time: 0, data: { turn: 1 } },
+  ]
+  if (mode !== undefined) {
+    events.push({ type: 'sandbox/mode', seq: SessionSeq(1), time: 1, data: { mode } })
+  }
   const id = SessionId('sandbox-session')
   return {
     id,
     ...ctx === undefined ? {} : { ctx: ctx.plugin(() => {}).ctx },
     session: {
       id,
-      header: { version: 0, id, createdAt: 0 },
-      events,
+      header: { version: SESSION_FORMAT_VERSION, id, createdAt: 0, isSeeded: false },
+      inheritedEventCount: SessionLogOffset(0),
+      firstLiveSeq: SessionLogOffset(0),
+      get seq() { return SessionLogOffset(events.length) },
+      eventAt: (seq: ReturnType<typeof SessionSeq>) => events[seq],
+      snapshotEvents: (
+        fromSeq = SessionLogOffset(0),
+        toSeqExclusive = SessionLogOffset(events.length),
+      ) => events.slice(fromSeq, toSeqExclusive),
       append: (type: string, data: Record<string, unknown>) => {
-        const event = { type, data }
+        const event = {
+          type,
+          seq: SessionSeq(events.length),
+          time: events.length,
+          data,
+        }
         events.push(event)
         onAppend?.(type)
         return event
@@ -261,7 +295,15 @@ function registerFakeAgent(ctx: Context, sessionId: string): Agent {
   const agent = {
     id,
     ctx: scopeFiber.ctx,
-    session: { id, header: { version: 0, id, createdAt: 0 }, events: [] },
+    session: {
+      id,
+      header: { version: SESSION_FORMAT_VERSION, id, createdAt: 0, isSeeded: false },
+      inheritedEventCount: SessionLogOffset(0),
+      firstLiveSeq: SessionLogOffset(0),
+      seq: SessionLogOffset(0),
+      eventAt: () => undefined,
+      snapshotEvents: () => [],
+    },
   } as unknown as Agent
   ctx.agents.register(agent)
   return agent
@@ -271,7 +313,7 @@ let callCounter = 0
 function call(ctx: Context, name: string, args: unknown, agent?: Agent) {
   return ctx.tools.execute({
     signal: testToolSignal,
-    callId: CallId(`call-${++callCounter}`),
+    callId: ToolCallId(`call-${++callCounter}`),
     name,
     arguments: args,
     ...agent ? { agent } : {},
@@ -312,7 +354,7 @@ describe('registration', () => {
       workdir: { type: 'string' },
       run_in_background: { type: 'boolean' },
     })
-    expect(schema?.parameters.required).toEqual(['command', 'description'])
+    expect(schema?.parameters.required).toEqual(['command'])
     const prompt = renderPrompt(await ctx.systemPrompt.assemble())
     expect(prompt).toContain('Non-zero exits are reported as `[exit code: N]` markers')
     expect(prompt).toContain('without a signal marker')
@@ -347,11 +389,28 @@ describe('argument validation', () => {
     expect(text(await call(ctx, 'pwsh', { command: 'Write-Output hi', description: 'd', timeoutMs: -1 })))
       .toContain('invalid timeoutMs: expected a positive number')
   })
+
+  it('runs when description is omitted', async () => {
+    const { ctx, bash } = await setup()
+    bash.handler = () => runResult('hi\n')
+    const result = await call(ctx, 'pwsh', { command: 'Write-Output hi' })
+    expect(result.isError).toBe(false)
+    expect(text(result)).toBe('hi\n')
+  })
+
+  it('tells the model that description is not the executed string when command is missing', async () => {
+    const { ctx } = await setup()
+    const result = await call(ctx, 'pwsh', { description: 'List running processes' })
+    expect(result.isError).toBe(true)
+    expect(text(result)).toContain('`command` is the shell string that runs')
+    expect(text(result)).toContain('Do not retry with only `description`')
+  })
 })
 
 describe('execution through the bash seam', () => {
   it('forwards command, session cwd, timeout, and managed DSH_* environment', async () => {
     const dshHome = mkdtempSync(join(tmpdir(), 'dsh-tool-pwsh-home-'))
+    tempDirs.push(dshHome)
     const { ctx, bash } = await setup({}, dshHome)
     bash.handler = () => runResult('hi\n')
     const agent = registerFakeAgent(ctx, 'session-1')
@@ -403,7 +462,7 @@ describe('execution through the bash seam', () => {
     bash.handler = () => runResult('ok\n')
     await ctx.tools.execute({
       signal: controller.signal,
-      callId: CallId('call-signal'),
+      callId: ToolCallId('call-signal'),
       name: 'pwsh',
       arguments: { command: 'Write-Output ok', description: 'ok' },
     })
@@ -502,6 +561,7 @@ describe('per-call sandbox policy resolution', () => {
   it('stamps the CALLING SESSION\'s resolved policy onto the request (session cwd, not the server launch dir)', async () => {
     const { ctx, bash } = await setupSandboxed()
     const sessionCwd = mkdtempSync(join(tmpdir(), 'dsh-tool-pwsh-policy-'))
+    tempDirs.push(sessionCwd)
     const agent = registerFakeAgent(ctx, 'policy-session')
     Object.assign(agent.session.header, { cwd: sessionCwd })
     const result = await call(ctx, 'pwsh', { command: 'Write-Output hi', description: 'say hi' }, agent)
@@ -593,10 +653,10 @@ describe('sandbox escalation through ctx.approval', () => {
     expect(prompted).not.toHaveBeenCalled()
 
     const malformed = sandboxAgent()
-    ;(malformed.session.events as unknown as Array<{ type: string; data: { mode: string } }>).push({
-      type: 'sandbox/mode',
-      data: { mode: 'unknown-mode' },
-    })
+    ;(malformed.session.append as unknown as (
+      type: string,
+      data: Record<string, unknown>,
+    ) => unknown)('sandbox/mode', { mode: 'unknown-mode' })
     expect(text(await call(ctx, 'pwsh', escalate, malformed))).toContain('not strictly wider')
   })
 
@@ -626,7 +686,7 @@ describe('sandbox escalation through ctx.approval', () => {
     const agent = sandboxAgent(undefined, ctx)
     ctx.agents.register(agent)
     const foreground = await ctx.tools.execute({
-      callId: CallId('sandbox-signal'),
+      callId: ToolCallId('sandbox-signal'),
       name: 'pwsh',
       arguments: escalate,
       agent,
@@ -649,7 +709,7 @@ describe('sandbox escalation through ctx.approval', () => {
     const start = vi.spyOn(bash, 'start')
 
     const result = await ctx.tools.execute({
-      callId: CallId('cancelled-escalation-background'),
+      callId: ToolCallId('cancelled-escalation-background'),
       name: 'pwsh',
       arguments: { ...escalate, run_in_background: true },
       agent,
@@ -752,7 +812,7 @@ describe('background execution through the job runtime', () => {
     const controller = new AbortController()
     controller.abort()
     const result = await ctx.tools.execute({
-      callId: CallId('call-pre-aborted'),
+      callId: ToolCallId('call-pre-aborted'),
       name: 'pwsh',
       arguments: { command: 'Start-Sleep -Seconds 60', description: 'test command', run_in_background: true },
       signal: controller.signal,
@@ -834,6 +894,8 @@ describe('UI presentation', () => {
       .toEqual({ card: 'terminal', title: 'Get-Process', description: 'List processes' })
     expect(definition?.presentCall?.({ command: 'Get-Process', description: 'List processes', workdir: 'C:\\work' }))
       .toMatchObject({ cwd: 'C:\\work' })
+    expect(definition?.presentCall?.({ command: 'Get-Process' }))
+      .toEqual({ card: 'terminal', title: 'Get-Process', description: 'Get-Process' })
   })
 
   it('a background pending call renders the generic card like the bash tool', async () => {
