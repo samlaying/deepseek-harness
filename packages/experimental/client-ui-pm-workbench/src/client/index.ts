@@ -56,6 +56,15 @@ export function apply(ctx: ClientContext): void {
         if (result.value.result.kind === 'error') return result.value.result.text ?? 'command failed'
         return null
       },
+      uploadToFeishu: async (card) => {
+        const result = await ctx.remote.commands.execute(sessionId, `/pm-feishu ${JSON.stringify(card)}`, [])
+        if (!result.ok) return null
+        if (result.value === undefined) return null
+        if (result.value.result.kind === 'error') return null
+        // Extract URL from success message
+        const match = result.value.result.text?.match(/🔗\s+(https:\/\/[^\s]+)/)
+        return match?.[1] ?? null
+      },
     }),
   }, PmWorkbenchView))
 }

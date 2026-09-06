@@ -32,6 +32,12 @@ export interface PmWorkbenchInjected {
   saveCard: (card: Pick<PmCard, 'id' | 'kind' | 'title' | 'markdown' | 'x' | 'y' | 'width' | 'height'> & {
     readonly projectId: string
   }) => Promise<string | null>
+  /**
+   * Upload card content to Feishu document.
+   * @param card - card to upload.
+   * @returns document URL on success, otherwise null.
+   */
+  uploadToFeishu: (card: { readonly title: string; readonly markdown: string }) => Promise<string | null>
 }
 
 /** Full props of the PM Workbench view. */
@@ -68,12 +74,13 @@ function previewMarkdown(markdown: string): ReactNode[] {
 }
 
 function CardPanel({
-  card, t, onSave, onMove,
+  card, t, onSave, onMove, onUploadToFeishu,
 }: {
   card: PmCard
   t: PmWorkbenchViewProps['t']
   onSave: (markdown: string) => void
   onMove: (x: number, y: number) => void
+  onUploadToFeishu: () => void
 }) {
   const [mode, setMode] = useState<'preview' | 'edit'>('edit')
   const [draft, setDraft] = useState(card.markdown)
@@ -128,6 +135,11 @@ function CardPanel({
       type: 'button',
       onClick: () => onSave(draft),
     }, t('card.save')),
+    h('button', {
+      type: 'button',
+      onClick: onUploadToFeishu,
+      style: { marginLeft: 'auto', background: 'rgb(0 132 255 / 85%)', borderColor: 'rgb(0 132 255)' },
+    }, '📤 飞书'),
   ),
   ),
   h('div', { className: css.body },
@@ -148,7 +160,7 @@ function CardPanel({
  * @returns the project list, live conversation column, and infinite canvas.
  */
 export function PmWorkbenchView(props: PmWorkbenchViewProps) {
-  const { t, pickFolder, openProject, saveCard, useProjection, useChat } = props
+  const { t, pickFolder, openProject, saveCard, uploadToFeishu, useProjection, useChat } = props
   const board = useProjection('pmWorkbench') as PmBoardSnapshot | null | undefined
   const live = useChat((snapshot: ChatSnapshot) => snapshot.legacy.partial)
   const nodes = useChat((snapshot: ChatSnapshot) => snapshot.legacy.nodes)
@@ -320,6 +332,14 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
         },
         onMove: (x, y) => {
           void saveCard({ ...card, projectId: board.projectId, x, y }).then(setError)
+        },
+        onUploadToFeishu: async () => {
+          const url = await uploadToFeishu({ title: card.title, markdown: card.markdown })
+          if (url) {
+            alert(`✅ 已上传到飞书！\n\n📄 ${card.title}\n🔗 ${url}`)
+          } else {
+            alert('❌ 上传失败，请检查飞书配置')
+          }
         },
       })),
     ),

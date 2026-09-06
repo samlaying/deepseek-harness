@@ -336,7 +336,111 @@ export function apply(ctx: Context): void {
         }
       },
     })
+    commandCtx.commands.register({
+      name: 'pm-feishu',
+      description: 'Upload PM card content to Feishu document',
+      input: { hint: '<json>' },
+      handler: async ({ rawInput }) => {
+        let parsed: { title?: string; markdown?: string }
+        try {
+          parsed = JSON.parse(rawInput) as typeof parsed
+        } catch {
+          return { kind: 'error', text: '/pm-feishu expects a JSON object' }
+        }
+        if (parsed.title === undefined || parsed.markdown === undefined) {
+          return { kind: 'error', text: '/pm-feishu JSON requires title and markdown' }
+        }
+        try {
+          const url = await uploadToFeishu(parsed.title, parsed.markdown)
+          return { kind: 'success', text: `✅ 已上传到飞书！\n\n📄 ${parsed.title}\n🔗 ${url}` }
+        } catch (error) {
+          return { kind: 'error', text: `上传失败: ${String(error)}` }
+        }
+      },
+    })
   })
+
+  /**
+   * Upload markdown content to Feishu document
+   */
+  async function uploadToFeishu(title: string, markdown: string): Promise<string> {
+    // 从环境变量获取飞书配置
+    const appId = process.env.FEISHU_APP_ID
+    const appSecret = process.env.FEISHU_APP_SECRET
+
+    if (!appId || !appSecret) {
+      throw new Error('缺少飞书配置：请设置 FEISHU_APP_ID 和 FEISHU_APP_SECRET 环境变量')
+    }
+
+    // 1. 获取 tenant_access_token
+    const tokenResponse = await fetch('https://open.feishu.cn/open-apis/auth/v3/tenant_access_token/internal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ app_id: appId, app_secret: appSecret }),
+    })
+
+    const tokenData = await tokenResponse.json() as { code: number; tenant_access_token?: string; msg?: string }
+    if (tokenData.code !== 0 || !tokenData.tenant_access_token) {
+      throw new Error(`获取 token 失败: ${tokenData.msg || 'unknown'}`)
+    }
+
+    const token = tokenData.tenant_access_token
+
+    // 2. 创建飞书文档
+    const createDocResponse = await fetch('https://open.feishu.cn/open-apis/docx/v1/documents', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title,
+        folder_token: '', // 空字符串表示创建在根目录
+      }),
+    })
+
+    const createDocData = await createDocResponse.json() as {
+      code: number
+      data?: { document: { document_id: string; revision_id: number } }
+      msg?: string
+    }
+
+    if (createDocData.code !== 0 || !createDocData.data) {
+      throw new Error(`创建文档失败: ${createDocData.msg || 'unknown'}`)
+    }
+
+    const documentId = createDocData.data.document.document_id
+
+    // 3. 批量更新文档内容 - 简单处理：将 markdown 转为纯文本段落
+    const paragraphs = markdown.split('\n\n').filter(p => p.trim())
+    const requests = paragraphs.map((text, index) => ({
+      request_id: `block_${index}`,
+      action: 'insert',
+      insert: {
+        location: {
+          zone_id: 'body',
+          index: index,
+        },
+        block_type: 'text',
+        text: {
+          style: {},
+          elements: [{ text_run: { content: text.trim() } }],
+        },
+      },
+    }))
+
+    await fetch(`https://open.feishu.cn/open-apis/docx/v1/documents/${documentId}/blocks/batch_update`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ requests }),
+    })
+
+    // 返回文档链接
+    return `https://feishu.cn/docx/${documentId}`
+  }
 
   const watchers = new Map<string, FSWatcher>()
   const timers = new Map<string, ReturnType<typeof setTimeout>>()
