@@ -123,8 +123,10 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
   const nodes = useChat((snapshot: ChatSnapshot) => snapshot.legacy.nodes)
   const [error, setError] = useState<string | null>(null)
   const [leftCollapsed, setLeftCollapsed] = useState(false)
+  const [midWidth, setMidWidth] = useState(240)
   const [pan, setPan] = useState({ x: 120, y: 80 })
   const drag = useRef<{ pointer: number; x: number; y: number; panX: number; panY: number } | null>(null)
+  const resizeRef = useRef<{ pointer: number; startX: number; startWidth: number } | null>(null)
   const liveText = useMemo(() => (live === null ? '' : blocksText(live.blocks)), [live])
 
   const bind = async () => {
@@ -149,6 +151,7 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
   return h('div', {
     className: `${css.root} ${leftCollapsed ? css.leftCollapsed : ''}`,
     'data-conversation-composer-overlay': '',
+    style: { '--pm-mid-width': `${midWidth}px` } as React.CSSProperties,
   },
   h('aside', { className: css.left, 'aria-label': t('projects.title') },
     h('div', { className: css.leftHeader },
@@ -212,6 +215,32 @@ export function PmWorkbenchView(props: PmWorkbenchViewProps) {
       liveText === '' ? null : h('p', { className: `${css.bubble} ${css.assistant}` }, liveText),
     ),
   ),
+  h('div', {
+    className: css.resizer,
+    onPointerDown: (event: PointerEvent<HTMLDivElement>) => {
+      if (event.button !== 0) return
+      resizeRef.current = {
+        pointer: event.pointerId,
+        startX: event.clientX,
+        startWidth: midWidth,
+      }
+      event.currentTarget.setPointerCapture(event.pointerId)
+      document.body.style.cursor = 'col-resize'
+    },
+    onPointerMove: (event: PointerEvent<HTMLDivElement>) => {
+      const resize = resizeRef.current
+      if (resize === null || resize.pointer !== event.pointerId) return
+      const delta = event.clientX - resize.startX
+      const newWidth = Math.max(180, Math.min(480, resize.startWidth + delta))
+      setMidWidth(newWidth)
+    },
+    onPointerUp: (event: PointerEvent<HTMLDivElement>) => {
+      if (resizeRef.current?.pointer === event.pointerId) {
+        resizeRef.current = null
+        document.body.style.cursor = ''
+      }
+    },
+  }),
   h('aside', { className: css.right, 'aria-label': t('canvas.title') },
     h('div', {
       className: css.canvas,
