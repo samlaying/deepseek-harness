@@ -1,0 +1,6 @@
+# Private PM Workbench Web layer. Apply after dsh-web-app and the host-side
+# dsh-experimental-pm-workbench-profile so the canvas mounts only with the tools.
+
+- insert:
+    - id: ui-pm-workbench
+      name: '@deepseek-ai/dsh-experimental-client-ui-pm-workbench'

@@ -28,8 +28,12 @@ The experimental group contains prototype capabilities that are not part of any 
 | [`agent-team`](agent-team/README.md) | Named teammates with durable messages and a shared task board | `ctx.agentTeams` |
 | [`agent-team-web-profile`](agent-team-web-profile/README.md) | Explicit source-checkout Web layer for Agent Teams | — |
 | [`client-ui-agent-team`](client-ui-agent-team/README.md) | Team roster, task board, and teammate navigation for Web | — |
+| [`client-ui-pm-workbench`](client-ui-pm-workbench/README.md) | Shared project canvas inside a Conversation view | — |
 | [`code-runtime-python`](code-runtime-python/README.md) | CPython subprocess backend for the code-execution seam | `ctx.codeRuntime` |
 | [`inspector`](inspector/README.md) | Cross-realm CDP hub for Host debugging, Client Runtime inspection, network capture, and Cordis trees | `ctx.inspector` |
+| [`pm-workbench`](pm-workbench/README.md) | Shared local project boards for PM Workbench | registers tools on `ctx.tools` |
+| [`pm-workbench-profile`](pm-workbench-profile/README.md) | Explicit source-checkout host layer for PM Workbench | — |
+| [`pm-workbench-web-profile`](pm-workbench-web-profile/README.md) | Explicit source-checkout Web layer for PM Workbench | — |
 | [`tool-agent-team`](tool-agent-team/README.md) | Nine tools that let the model create, message, and coordinate teammates | registers scoped tools on `ctx.tools` |
 | [`webworker-packer`](webworker-packer/README.md) | Builds the gzip-compressed VFS image consumed by the browser worker preview | library and CLI — no ctx key |
 | [`webworker-runtime`](webworker-runtime/README.md) | Runs the harness plugin tree inside a dedicated browser worker | library and worker entry — no ctx key |
