@@ -65,6 +65,107 @@ var PmMemoryService = class extends Service {
 };
 function apply(ctx) {
 	ctx.plugin(PmMemoryService);
+	ctx.inject(["systemPrompt", "pmMemory"], (hostCtx) => {
+		hostCtx.systemPrompt.section({
+			name: "pm-memory-ssot",
+			order: 50,
+			text: async () => {
+				try {
+					const pmContext = await hostCtx.pmMemory.readContext();
+					if (!pmContext) return "";
+					return `\n## PM 项目记忆与业务上下文 (Single Source of Truth)\n${pmContext}\n`;
+				} catch {
+					return "";
+				}
+			}
+		});
+	});
+	ctx.inject(["tools", "pmMemory"], (hostCtx) => {
+		hostCtx.tools.register({
+			name: "pm_get_memory",
+			description: "Fetch the latest PM project memory, team stakeholders, decision log, or terminology.",
+			parameters: {
+				type: "object",
+				properties: { category: {
+					type: "string",
+					description: "Optional category to inspect: all | context | people | decisions | terms",
+					enum: [
+						"all",
+						"context",
+						"people",
+						"decisions",
+						"terms"
+					]
+				} }
+			},
+			output: {
+				schema: {
+					type: "object",
+					properties: { content: { type: "string" } },
+					required: ["content"]
+				},
+				render(_args, value) {
+					return [{
+						type: "text",
+						text: value.content
+					}];
+				}
+			},
+			async execute(_args) {
+				return { content: await hostCtx.pmMemory.readContext() || "No PM memory loaded." };
+			}
+		});
+		hostCtx.tools.register({
+			name: "pm_record_decision",
+			description: "Record an architectural or product decision into the PM Workbench Single Source of Truth.",
+			parameters: {
+				type: "object",
+				properties: {
+					decision: {
+						type: "string",
+						description: "The finalized decision or rule."
+					},
+					owner: {
+						type: "string",
+						description: "The decision owner / stakeholder."
+					},
+					reason: {
+						type: "string",
+						description: "The rationale or trade-off analysis."
+					}
+				},
+				required: [
+					"decision",
+					"owner",
+					"reason"
+				]
+			},
+			output: {
+				schema: {
+					type: "object",
+					properties: { status: { type: "string" } },
+					required: ["status"]
+				},
+				render(_args, value) {
+					return [{
+						type: "text",
+						text: `✅ 决策已沉淀入库: ${value.status}`
+					}];
+				}
+			},
+			async execute(args) {
+				const a = args;
+				const today = (/* @__PURE__ */ new Date()).toISOString().split("T")[0];
+				await hostCtx.pmMemory.recordDecision({
+					date: today,
+					decision: a.decision,
+					owner: a.owner,
+					reason: a.reason
+				});
+				return { status: `[${today}] ${a.decision} (by ${a.owner})` };
+			}
+		});
+	});
 }
 //#endregion
 export { PmMemoryService, apply };

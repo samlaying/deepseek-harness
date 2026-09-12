@@ -15,7 +15,9 @@
     "build": "tsdown"
   },
   "dependencies": {
-    "@deepseek-ai/cordis": "workspace:*"
+    "@deepseek-ai/cordis": "workspace:*",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
+    "@deepseek-ai/dsh-tools": "workspace:^"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:*"
