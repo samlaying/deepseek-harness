@@ -217,6 +217,62 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
                 <b>最终拍板 (选项 B - 事务冻结+静默放行):</b> 启动前先冻结预估额度，超额部分后台静默补扣并在明细账单中打上黄色「超额异常」Tag，绝对不中断生成流。
               </div>
             </div>
+
+            {/* 抉择 3: 预估触发边界 */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0, 212, 255, 0.2)', borderRadius: '8px', padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff' }}>[抉择 3] 预计消耗触发边界与输入摩擦？</span>
+                <span style={{ fontSize: '11px', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '2px 6px', borderRadius: '4px' }}>👑 PM 已拍板</span>
+              </div>
+              <div style={{ fontSize: '12px', color: '#9da3ae', marginBottom: '8px' }}>
+                RedTeam 质询: 大模型输出长度具有长尾随机性，若强行让用户每次确认预估，会直接破坏聊天连贯性。
+              </div>
+              <div style={{ background: 'rgba(0, 255, 170, 0.08)', border: '1px solid rgba(0, 255, 170, 0.25)', borderRadius: '6px', padding: '8px 10px', fontSize: '12px', color: '#fff' }}>
+                <b>最终拍板 (全量微型预估静默渲染):</b> 输入框下方静默渲染微字提示「预计 ~1-3 算力」，无需点击确认，回车直发，零打扰。
+              </div>
+            </div>
+
+            {/* 抉择 4: Alpro 回收与流水模型 */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0, 212, 255, 0.2)', borderRadius: '8px', padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff' }}>[抉择 4] Alpro 账号回收的财务对账模型？</span>
+                <span style={{ fontSize: '11px', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '2px 6px', borderRadius: '4px' }}>👑 PM 已拍板</span>
+              </div>
+              <div style={{ fontSize: '12px', color: '#9da3ae', marginBottom: '8px' }}>
+                RedTeam 质询: 对话是即时消费（负向），回收是离职/缩容席位折算返还（正向），混在一起对账可能带来歧义。
+              </div>
+              <div style={{ background: 'rgba(0, 255, 170, 0.08)', border: '1px solid rgba(0, 255, 170, 0.25)', borderRadius: '6px', padding: '8px 10px', fontSize: '12px', color: '#fff' }}>
+                <b>最终拍板 (统一单流水表 + 正负冲抵):</b> 统一在一张流水展示，区分「对话消耗 (-)」与「Alpro回收 (+)」，支持顶部筛选过滤，保证资产变动完整可溯。
+              </div>
+            </div>
+
+            {/* 抉择 5: 预估与实际偏差防扯皮 */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0, 212, 255, 0.2)', borderRadius: '8px', padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff' }}>[抉择 5] 任务预估 20 实耗 80 的客诉防扯皮机制？</span>
+                <span style={{ fontSize: '11px', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '2px 6px', borderRadius: '4px' }}>👑 PM 已拍板</span>
+              </div>
+              <div style={{ fontSize: '12px', color: '#9da3ae', marginBottom: '8px' }}>
+                RedTeam 质询: 如果模型递归死循环跑爆算力，难缠用户必然投诉平台欺诈。
+              </div>
+              <div style={{ background: 'rgba(0, 255, 170, 0.08)', border: '1px solid rgba(0, 255, 170, 0.25)', borderRadius: '6px', padding: '8px 10px', fontSize: '12px', color: '#fff' }}>
+                <b>最终拍板 (基础保底预估 + 多退少补契约):</b> 卡片明确标明「~15-25 算力（基于平均深度），最终按实际生成多退少补」；余额不足上限直接拦截发起。
+              </div>
+            </div>
+
+            {/* 抉择 6: WorkBuddy 心智对齐 */}
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(0, 212, 255, 0.2)', borderRadius: '8px', padding: '14px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 600, color: '#00d4ff' }}>[抉择 6] WorkBuddy 算力透明度 vs 认知负荷平衡？</span>
+                <span style={{ fontSize: '11px', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '2px 6px', borderRadius: '4px' }}>👑 PM 已拍板</span>
+              </div>
+              <div style={{ fontSize: '12px', color: '#9da3ae', marginBottom: '8px' }}>
+                RedTeam 质询: 每条消息都挂算力会制造极强的花钱焦虑，压抑高频使用。
+              </div>
+              <div style={{ background: 'rgba(0, 255, 170, 0.08)', border: '1px solid rgba(0, 255, 170, 0.25)', borderRadius: '6px', padding: '8px 10px', fontSize: '12px', color: '#fff' }}>
+                <b>最终拍板 (轻微标 + Hover 展开 Token 拆解):</b> 气泡末尾仅展示浅灰色微标「⚡ 消耗 18 算力」，Hover 展开输入/输出/Cache节省百分比，满足极客对账。
+              </div>
+            </div>
           </div>
         </div>
 
