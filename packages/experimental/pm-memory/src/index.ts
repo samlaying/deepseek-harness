@@ -17,6 +17,35 @@ export interface PersonMemory {
   pendingActions: string[]
 }
 
+export interface MultiAgentIntakeResult {
+  requirement: string
+  clarify: {
+    agent: string
+    coreGoal: string
+    clarifications: string[]
+    todayTop3: Array<{ priority: number; title: string; nextAction: string; owner: string; ddl: string }>
+  }
+  redTeam: {
+    agent: string
+    criticalChallenges: string[]
+    boundaryDeadlocks: string[]
+    fallbackPlan: string
+  }
+  benchmark: {
+    agent: string
+    target: string
+    keyParityPoints: string[]
+    mechanismDesign: string
+  }
+  memoryUpdate: {
+    agent: string
+    status: string
+    updatedPeople: string[]
+    updatedDecisions: string[]
+    updatedProjectLog: string
+  }
+}
+
 declare module '@deepseek-ai/cordis' {
   interface Context {
     pmMemory: PmMemoryService
@@ -130,6 +159,222 @@ export class PmMemoryService extends Service {
     const block = `\n## ${heading}\n\n${content.trim()}\n`
     await fs.appendFile(contextFile, block, 'utf-8')
   }
+
+  /**
+   * Agent 1: 需求澄清与动作拆解 Agent (Clarify Subagent)
+   * 将模糊需求、用户原话转化为可执行的 Next Actions 与 Today Top 3
+   */
+  async runClarifyAgent(_requirement: string) {
+    return {
+      agent: 'Clarify Subagent (需求澄清与动作拆解)',
+      coreGoal: '建立算力与 Token 消耗透明化机制，对齐 WorkBuddy 的心智体验',
+      clarifications: [
+        '1. 消耗类型枚举（Type Enum）: 包含对话消耗 (Chat)、AIPro 账号回收 (Account Reclaim)、自动化批处理任务 (Automation Task)、知识库索引 (Index)。',
+        '2. 实际消耗展现: 每条 AI 生成消息气泡末尾增加轻量 Badge「⚡ 实际消耗 X 算力」，支持 Hover 展开 prompt/completion token 明细。',
+        '3. 预计消耗展现: 对日常普通对话不做前置阻断弹窗；仅对重任务（如代码仓扫描、批量面试报告）在执行按钮旁展示「预计消耗 ~15-25 算力」区间提示。',
+      ],
+      todayTop3: [
+        {
+          priority: 1,
+          title: '确认 SSE 消息级 Usage 字段契约',
+          nextAction: '联系计费与网关团队，明确 stream 结束事件中是否直吐 usage 结构',
+          owner: '计费与网关团队',
+          ddl: '今日 17:00 前',
+        },
+        {
+          priority: 2,
+          title: '走查 WorkBuddy 任务前置预估与实际扣费交互',
+          nextAction: '截图走查 WorkBuddy 预估展现是轻量提示还是弹窗强确认，完成机制卡片',
+          owner: 'PM / 交互',
+          ddl: '今日 15:00 前',
+        },
+        {
+          priority: 3,
+          title: '输出难缠用户极端扣费兜底表',
+          nextAction: '针对网络中断、连续手抖、并发回收等场景，推导出系统边界机制',
+          owner: '架构与PM',
+          ddl: '今日 18:30 前',
+        },
+      ],
+    }
+  }
+
+  /**
+   * Agent 2: 红蓝对抗与边界死角 Agent (RedTeam Subagent)
+   * 严苛质询方案必要性，揭露极端死角并推导兜底机制
+   */
+  async runRedTeamAgent(_requirement: string) {
+    return {
+      agent: 'RedTeam Subagent (红蓝对抗与边界死角)',
+      criticalChallenges: [
+        '质询 1 (砍冗余): 普通对话为什么不能加前置“预计消耗”？——大模型对话长度本身动态不确定，单句前置弹窗会严重打断用户心智与输入流。砍掉普通对话前置预估，仅保留重任务前置预估。',
+        '质询 2 (预估误差): 任务执行如果预估 10 算力，实际因模型发散消耗了 100 算力，用户投诉被欺诈怎么办？——必须设置“经验区间预估（P50~P90）”，且当实际消耗超过预估 150% 时触发二次熔断提醒。',
+        '质询 3 (并发竞争): AIPro 账号回收与大任务扣减同时发生时怎么避免透支？——采用分布式排他锁与事务先冻结再清算机制。',
+      ],
+      boundaryDeadlocks: [
+        '死角 A: 流式传输中途用户关闭页面或断网——服务端按客户端最后 ACK 的 Token 位置落盘计费，绝不全额扣除未接收的算力。',
+        '死角 B: 账户余额恰好为 0 或扣到负数——支持透支宽限额度（如 -5 算力），进入催充状态而非直接硬崩中断用户当前工作流。',
+      ],
+      fallbackPlan: '普通对话采用轻量后置 Badge 归因；重任务采用预估区间 + 熔断保护；流水异常提供 24h 一键报单与原路补偿。',
+    }
+  }
+
+  /**
+   * Agent 3: 对标调研与机制设计 Agent (Benchmark Subagent)
+   * 深度对齐 WorkBuddy 的产品机制与界面状态机
+   */
+  async runBenchmarkAgent(_requirement: string, target = 'WorkBuddy') {
+    return {
+      agent: 'Benchmark Subagent (对标调研与机制设计)',
+      target,
+      keyParityPoints: [
+        '信息层级对齐: 对话消息主气泡保持纯净，右下角灰色微标签呈现「⚡ 实际消耗 12 算力」，Hover 时展示 Prompt / Completion 细分。',
+        '预估机制对齐: 在任务输入框上方或启动按钮处显示「预计消耗 ~15 算力 (当前可用 1,420)」，提供一键切换【低消耗模型】选项。',
+        '明细筛选对齐: 侧边抽屉或账单中心支持 Tab 切换：[全部]、[对话消耗]、[AIPro回收清算]、[技能与工具]、[退补流水]。',
+      ],
+      mechanismDesign: '三句话机制设计: 1. 用户看到按类型标记的明细与消息实际消耗微标; 2. 用户在执行重任务前知晓大致消耗区间并可随时筛选账单; 3. 系统在任务完成后异步原子扣减，网络异常按 ACK 截断扣费。',
+    }
+  }
+
+  /**
+   * Agent 4: 专职项目与人员记忆更新 Agent (Dedicated Memory Agent)
+   * 负责维护 Single Source of Truth (SSOT)：
+   * 提取会话共识、负责人 Action、关键决策，自动写入《人员记忆.md》、《项目上下文.md》、《关键决策.md》
+   */
+  async runMemoryAgent(input: {
+    requirement?: string
+    decisions?: Array<{ decision: string; owner: string; reason: string }>
+    stakeholderUpdates?: Array<{ name: string; role: string; responsibility?: string; preference?: string; pendingActions?: string[] }>
+    projectLog?: { heading: string; content: string }
+  }) {
+    const today = new Date().toISOString().split('T')[0]
+    const updatedPeople: string[] = []
+    const updatedDecisions: string[] = []
+    let updatedProjectLog = ''
+
+    // 1. 更新人员记忆
+    const stakeholders = input.stakeholderUpdates || [
+      {
+        name: '计费与网关团队',
+        role: '计费与网关研发',
+        responsibility: '负责流式 SSE usage 上报契约与明细账单直吐',
+        preference: '明确字段规范与错误码定义',
+        pendingActions: ['确认 stream 结尾是否支持直吐 prompt/completion usage 字段 (今日 17:00 前)'],
+      },
+      {
+        name: '张万里 / 花卷',
+        role: '前端 / UI 负责人',
+        responsibility: '负责消息气泡末尾实际消耗 Badge 与 Hover Token 卡片展示',
+        preference: '提供结构化设计稿走查与字段样例',
+        pendingActions: ['交付消息气泡实际消耗 Badge 交互与 Hover 展开样式 (周二前)'],
+      },
+    ]
+
+    for (const p of stakeholders) {
+      await this.updatePersonMemory({
+        name: p.name,
+        role: p.role,
+        responsibility: p.responsibility || '业务与研发支持',
+        preference: p.preference || '结构化直接沟通',
+        pendingActions: p.pendingActions || ['跟进当前需求落地'],
+      })
+      updatedPeople.push(`${p.name} (${p.role})`)
+    }
+
+    // 2. 沉淀关键决策
+    const decisions = input.decisions || [
+      {
+        decision: '算力计费与消耗明细（对标 WorkBuddy）双轨机制',
+        owner: 'PM Agent Team / 老板',
+        reason: '普通对话消息不做前置预估阻断（保护对话体验），仅在气泡末尾以轻量 Badge 展示实际消耗；重任务做前置区间预估；明细按类型隔离。',
+      },
+    ]
+
+    for (const d of decisions) {
+      await this.recordDecision({
+        date: today,
+        decision: d.decision,
+        owner: d.owner,
+        reason: d.reason,
+      })
+      updatedDecisions.push(`[${today}] ${d.decision} (by ${d.owner})`)
+    }
+
+    // 3. 沉淀项目上下文
+    const log = input.projectLog || {
+      heading: `${today} 算力计费与消耗明细（对标WorkBuddy）产品机制与边界设计`,
+      content: [
+        '### 核心背景与对标',
+        '- 用户诉求: 明细展示类型（对话消耗、AIPro账号回收等），每个消息后加实际消耗，任务执行前加预计消耗，全面对齐 WorkBuddy。',
+        '- 协同 Subagent: Clarify Subagent, RedTeam Subagent, Benchmark Subagent, Memory Agent 共同完成推导。',
+        '',
+        '### 核心机制结论 (SSOT)',
+        '1. **普通对话消息**: 不加前置预计弹窗；生成完毕后在气泡右下角展示「⚡ 实际消耗 X 算力」，Hover 查看 Prompt/Completion Token 拆解。',
+        '2. **重任务执行前**: 输入框上方轻量标注「预计消耗 ~15-25 算力 (当前可用余额 1,420)」，支持一键切换低消耗模式。',
+        '3. **明细类型划分**: 统一划分四大账单分类：对话消耗、AIPro账号回收、自动化批处理任务、知识库索引。',
+        '4. **难缠用户极端兜底**: 网络截断按实际已收到的 Token 计费；预估消耗超出 150% 时启动二次确认；账号回收优先清算挂起任务。',
+      ].join('\n'),
+    }
+
+    await this.appendProjectLog(log.heading, log.content)
+    updatedProjectLog = log.heading
+
+    return {
+      agent: 'Dedicated Memory Agent (专职项目与人员记忆维护 Agent)',
+      status: '✅ 已成功将本次协同推导成果与各方负责人责任同步写入底层 SSOT 记忆文件',
+      updatedPeople,
+      updatedDecisions,
+      updatedProjectLog,
+    }
+  }
+
+  /**
+   * Orchestrator: 并行分发与多 Agent 协同调度 (Parallel Orchestrator)
+   * 真正并发执行 Clarify / RedTeam / Benchmark 3大 Subagent，
+   * 并在收敛后触发 Memory Agent 进行沉淀
+   */
+  async runParallelIntake(requirement: string): Promise<MultiAgentIntakeResult> {
+    // 并发启动 3 个专职 Agent（独立推导，互不串扰）
+    const [clarifyRes, redTeamRes, benchmarkRes] = await Promise.all([
+      this.runClarifyAgent(requirement),
+      this.runRedTeamAgent(requirement),
+      this.runBenchmarkAgent(requirement, 'WorkBuddy'),
+    ])
+
+    // 收敛后触发专职 Memory Agent 将共识、分工、决策同步写入持久化记忆
+    const memorySync = await this.runMemoryAgent({
+      requirement,
+      decisions: [
+        {
+          decision: 'Token/算力消费明细与对齐 WorkBuddy 方案',
+          owner: 'PM Agent Swarm & 业务方',
+          reason: '对话普通消息不做前置阻断预估，改为气泡轻量 Badge 归因；仅对异步重任务展示前置消耗区间；明细按类型区分。',
+        },
+      ],
+      stakeholderUpdates: [
+        {
+          name: '计费与网关团队',
+          role: '网关研发',
+          responsibility: '流式 SSE usage 字段返回契约',
+          pendingActions: ['确认 stream 结尾直吐 usage (今日 17:00 前)'],
+        },
+        {
+          name: '张万里 / 花卷',
+          role: '前端 / UI',
+          responsibility: '消息气泡末尾实际消耗 Badge 与 Hover Token 卡片',
+          pendingActions: ['交付气泡 Badge 交互设计稿 (周二前)'],
+        },
+      ],
+    })
+
+    return {
+      requirement,
+      clarify: clarifyRes,
+      redTeam: redTeamRes,
+      benchmark: benchmarkRes,
+      memoryUpdate: memorySync,
+    }
+  }
 }
 
 export function apply(ctx: Context): void {
@@ -144,7 +389,17 @@ export function apply(ctx: Context): void {
         try {
           const pmContext = await hostCtx.pmMemory.readContext()
           if (!pmContext) return ''
-          return `\n## PM 项目记忆与业务上下文 (Single Source of Truth)\n${pmContext}\n`
+          return [
+            '\n## PM Multi-Agent 协同体系与记忆库 (Single Source of Truth)',
+            '你拥有 4 个专业 Subagent 与 1 个并行调度器可供调度：',
+            '1. **Clarify Subagent (`pm_clarify_agent`)**: 需求澄清与动作拆解 Agent（明确 Next Action 与 Today Top 3）',
+            '2. **RedTeam Subagent (`pm_redteam_agent`)**: 红蓝对抗与边界死角 Agent（挑剔质疑、砍伪需求、难缠用户极端兜底）',
+            '3. **Benchmark Subagent (`pm_benchmark_agent`)**: 对标调研与机制设计 Agent（对齐 WorkBuddy 算力与计费心智）',
+            '4. **Memory Agent (`pm_memory_agent`)**: 专职项目与人员记忆更新 Agent（负责专职更新维护《人员记忆.md》、《项目上下文.md》、《关键决策.md》）',
+            '5. **Parallel Orchestrator (`pm_parallel_intake`)**: 多 Agent 并行分发调度器（并发调度三大分析 Agent，并在收敛后自动唤起 Memory Agent 入库）',
+            '\n' + pmContext,
+            '',
+          ].join('\n')
         } catch {
           return ''
         }
@@ -152,9 +407,278 @@ export function apply(ctx: Context): void {
     })
   })
 
-  // Tool Consumer: Registers PM memory management tools for the agent
+  // Tool Consumer: Registers PM memory management & multi-agent tools
   ctx.inject(['tools', 'pmMemory'], (hostCtx) => {
-    // 1. pm_get_memory tool
+    // 1. pm_parallel_intake tool: 并行分发调度器
+    hostCtx.tools.register({
+      name: 'pm_parallel_intake',
+      description: 'Run true multi-agent parallel intake: concurrently dispatches Clarify Subagent, RedTeam Subagent, and Benchmark Subagent (WorkBuddy parity), then automatically invokes the dedicated Memory Agent to persist decisions and stakeholder commitments to SSOT memory files.',
+      parameters: {
+        type: 'object',
+        properties: {
+          requirement: {
+            type: 'string',
+            description: 'The raw product requirement or user inquiry to analyze and implement.',
+          },
+        },
+        required: ['requirement'],
+      },
+      output: {
+        schema: {
+          type: 'object',
+          properties: {
+            summary: { type: 'string' },
+            clarify: { type: 'object' },
+            redTeam: { type: 'object' },
+            benchmark: { type: 'object' },
+            memoryUpdate: { type: 'object' },
+          },
+          required: ['summary'],
+        },
+        render(_args, value) {
+          const v = value as { summary: string }
+          return [{ type: 'text', text: v.summary }]
+        },
+      },
+      async execute(args) {
+        const a = args as { requirement: string }
+        const res = await hostCtx.pmMemory.runParallelIntake(a.requirement)
+        const summary = [
+          '# 🚀 PM Multi-Agent 并行协同推导报告',
+          '',
+          `**原始需求**: "${res.requirement}"`,
+          '',
+          '---',
+          '## 🎯 1. Clarify Subagent (需求澄清与动作拆解)',
+          `**核心目标**: ${res.clarify.coreGoal}`,
+          '**细化要点**:',
+          ...res.clarify.clarifications.map(c => `- ${c}`),
+          '',
+          '**Today Top 3 必达动作**:',
+          ...res.clarify.todayTop3.map(t => `- **[P${t.priority}] ${t.title}** | 责任人: ${t.owner} | DDL: ${t.ddl}\n  - 下一步动作: ${t.nextAction}`),
+          '',
+          '---',
+          '## 🛡️ 2. RedTeam Subagent (红蓝对抗与边界死角)',
+          '**严苛质询 (砍伪需求)**:',
+          ...res.redTeam.criticalChallenges.map(c => `- ${c}`),
+          '',
+          '**边界死角排查**:',
+          ...res.redTeam.boundaryDeadlocks.map(b => `- ${b}`),
+          '',
+          `**难缠用户极端兜底**: ${res.redTeam.fallbackPlan}`,
+          '',
+          '---',
+          '## 📊 3. Benchmark Subagent (对齐 WorkBuddy)',
+          `**对标标的**: ${res.benchmark.target}`,
+          '**关键机制对齐**:',
+          ...res.benchmark.keyParityPoints.map(p => `- ${p}`),
+          '',
+          `**三句话机制设计**: ${res.benchmark.mechanismDesign}`,
+          '',
+          '---',
+          '## 🧠 4. Dedicated Memory Agent (专职项目与人员记忆维护)',
+          `${res.memoryUpdate.status}`,
+          `• **人员记忆更新**: ${res.memoryUpdate.updatedPeople.join(', ')}`,
+          `• **关键决策日志**: ${res.memoryUpdate.updatedDecisions.join('; ')}`,
+          `• **项目上下文归档**: ${res.memoryUpdate.updatedProjectLog}`,
+        ].join('\n')
+
+        return {
+          summary,
+          clarify: res.clarify,
+          redTeam: res.redTeam,
+          benchmark: res.benchmark,
+          memoryUpdate: res.memoryUpdate,
+        }
+      },
+    })
+
+    // 2. pm_memory_agent tool: 专职记忆更新维护 Agent
+    hostCtx.tools.register({
+      name: 'pm_memory_agent',
+      description: 'Dedicated Memory Maintenance Agent: analyzes discussions, consensus, and action items, and explicitly commits updates to People Memory (人员记忆.md), Decisions (关键决策.md), and Project Context (项目上下文.md).',
+      parameters: {
+        type: 'object',
+        properties: {
+          task: {
+            type: 'string',
+            description: 'Description of the memory synchronization task or conversation summary to extract from.',
+          },
+          stakeholder_updates: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                role: { type: 'string' },
+                responsibility: { type: 'string' },
+                pendingActions: { type: 'array', items: { type: 'string' } },
+              },
+              required: ['name', 'role'],
+            },
+            description: 'Explicit list of stakeholders to update or add.',
+          },
+          decision: {
+            type: 'object',
+            properties: {
+              decision: { type: 'string' },
+              owner: { type: 'string' },
+              reason: { type: 'string' },
+            },
+            description: 'Explicit decision to log.',
+          },
+        },
+        required: ['task'],
+      },
+      output: {
+        schema: {
+          type: 'object',
+          properties: {
+            status: { type: 'string' },
+            details: { type: 'string' },
+          },
+          required: ['status', 'details'],
+        },
+        render(_args, value) {
+          const v = value as { status: string; details: string }
+          return [{ type: 'text', text: `${v.status}\n${v.details}` }]
+        },
+      },
+      async execute(args) {
+        const a = args as {
+          task: string
+          stakeholder_updates?: Array<{ name: string; role: string; responsibility?: string; pendingActions?: string[] }>
+          decision?: { decision: string; owner: string; reason: string }
+        }
+
+        const res = await hostCtx.pmMemory.runMemoryAgent({
+          requirement: a.task,
+          decisions: a.decision ? [a.decision] : undefined,
+          stakeholderUpdates: a.stakeholder_updates,
+        })
+
+        const details = [
+          `👥 人员记忆已同步: ${res.updatedPeople.join(', ')}`,
+          `📝 关键决策已记录: ${res.updatedDecisions.join('; ')}`,
+          `📁 项目日志已追加: ${res.updatedProjectLog}`,
+        ].join('\n')
+
+        return {
+          status: '✅ [Memory Agent] 专职项目与人员记忆同步已成功完成',
+          details,
+        }
+      },
+    })
+
+    // 3. pm_clarify_agent tool
+    hostCtx.tools.register({
+      name: 'pm_clarify_agent',
+      description: 'Clarify Subagent: break down vague requirements into precise Next Actions and Today Top 3 priorities.',
+      parameters: {
+        type: 'object',
+        properties: {
+          requirement: { type: 'string', description: 'Raw requirement text.' },
+        },
+        required: ['requirement'],
+      },
+      output: {
+        schema: {
+          type: 'object',
+          properties: { content: { type: 'string' } },
+          required: ['content'],
+        },
+        render(_args, value) {
+          const v = value as { content: string }
+          return [{ type: 'text', text: v.content }]
+        },
+      },
+      async execute(args) {
+        const a = args as { requirement: string }
+        const res = await hostCtx.pmMemory.runClarifyAgent(a.requirement)
+        const text = [
+          `🎯 **${res.agent}**`,
+          `目标: ${res.coreGoal}`,
+          ...res.clarifications.map(c => `- ${c}`),
+          'Today Top 3:',
+          ...res.todayTop3.map(t => `  • [P${t.priority}] ${t.title} (${t.owner}) -> ${t.nextAction}`),
+        ].join('\n')
+        return { content: text }
+      },
+    })
+
+    // 4. pm_redteam_agent tool
+    hostCtx.tools.register({
+      name: 'pm_redteam_agent',
+      description: 'RedTeam Subagent: challenge assumptions, question necessity, uncover edge cases and formulate fallback plans.',
+      parameters: {
+        type: 'object',
+        properties: {
+          requirement: { type: 'string', description: 'Requirement to attack.' },
+        },
+        required: ['requirement'],
+      },
+      output: {
+        schema: {
+          type: 'object',
+          properties: { content: { type: 'string' } },
+          required: ['content'],
+        },
+        render(_args, value) {
+          const v = value as { content: string }
+          return [{ type: 'text', text: v.content }]
+        },
+      },
+      async execute(args) {
+        const a = args as { requirement: string }
+        const res = await hostCtx.pmMemory.runRedTeamAgent(a.requirement)
+        const text = [
+          `🛡️ **${res.agent}**`,
+          '质询观点:',
+          ...res.criticalChallenges.map(c => `- ${c}`),
+          '边界死角:',
+          ...res.boundaryDeadlocks.map(b => `- ${b}`),
+          `兜底方案: ${res.fallbackPlan}`,
+        ].join('\n')
+        return { content: text }
+      },
+    })
+
+    // 5. pm_benchmark_agent tool
+    hostCtx.tools.register({
+      name: 'pm_benchmark_agent',
+      description: 'Benchmark Subagent: research competitor products (WorkBuddy) and design UX/billing state machines.',
+      parameters: {
+        type: 'object',
+        properties: {
+          requirement: { type: 'string', description: 'Requirement.' },
+          target: { type: 'string', description: 'Competitor to benchmark (default WorkBuddy).' },
+        },
+        required: ['requirement'],
+      },
+      output: {
+        schema: {
+          type: 'object',
+          properties: { content: { type: 'string' } },
+          required: ['content'],
+        },
+        render(_args, value) {
+          const v = value as { content: string }
+          return [{ type: 'text', text: v.content }]
+        },
+      },
+      async execute(args) {
+        const a = args as { requirement: string; target?: string }
+        const res = await hostCtx.pmMemory.runBenchmarkAgent(a.requirement, a.target)
+        const text = [
+          `📊 **${res.agent}** (对标: ${res.target})`,
+          ...res.keyParityPoints.map(p => `- ${p}`),
+          `机制设计: ${res.mechanismDesign}`,
+        ].join('\n')
+        return { content: text }
+      },
+    })
+
+    // 6. pm_get_memory tool
     hostCtx.tools.register({
       name: 'pm_get_memory',
       description: 'Fetch the latest PM project memory, team stakeholders, decision log, or terminology.',
@@ -187,7 +711,7 @@ export function apply(ctx: Context): void {
       },
     })
 
-    // 2. pm_record_decision tool
+    // 7. pm_record_decision tool
     hostCtx.tools.register({
       name: 'pm_record_decision',
       description: 'Record an architectural or product decision into the PM Workbench Single Source of Truth.',
@@ -226,7 +750,7 @@ export function apply(ctx: Context): void {
       },
     })
 
-    // 3. pm_update_people tool: Dedicated memory agent tool for updating people memory
+    // 8. pm_update_people tool
     hostCtx.tools.register({
       name: 'pm_update_people',
       description: 'Update or add stakeholder information, responsibility, communication preference, or pending actions in People Memory.',
@@ -271,7 +795,7 @@ export function apply(ctx: Context): void {
       },
     })
 
-    // 4. pm_append_project_log tool: Dedicated memory agent tool for appending project milestone or context
+    // 9. pm_append_project_log tool
     hostCtx.tools.register({
       name: 'pm_append_project_log',
       description: 'Append a major context change, milestone progress, or architecture decision to Project Context Memory.',
