@@ -2,7 +2,11 @@
   "extends": "../../../tsconfig.base.client.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib/types"
+    "outDir": "lib/types",
+    // The Host face stores custom skin images under the harness home, so this
+    // package's node-side files need node types. The client bundle's purity is
+    // enforced by the bundler's module-edge gate, not by this list.
+    "types": ["node"]
   },
   "include": [
     "src"

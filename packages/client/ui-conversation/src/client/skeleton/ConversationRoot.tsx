@@ -183,8 +183,12 @@ export function ConversationRoot({
     </div>
   )
 
+  // deepseek-harness-skin: the panel paints an opaque page background, which is
+  // what a skin has to replace with a translucent wash for the frame's hero to
+  // show behind a transcript. One hook for the whole panel keeps the header,
+  // the transcript and the composer seat on a single surface.
   return (
-    <div className={css.root} data-phase={phase}>
+    <div className={css.root} data-phase={phase} data-conversation-panel="">
       {renderSlot('conversation.session.header', {})}
       <div className={css.scrollBody} data-conversation-scroll="">
         {renderSlot('conversation.session', {})}

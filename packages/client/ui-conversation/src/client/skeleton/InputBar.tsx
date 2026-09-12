@@ -760,6 +760,7 @@ export function InputBar({
                 <button
                   type="button"
                   className={css.primary}
+                  data-skin-primary-button
                   aria-label={t('input.stop')}
                   disabled={stop === undefined}
                   onMouseDown={keepFocus}
@@ -775,6 +776,7 @@ export function InputBar({
               <button
                 type="button"
                 className={css.primary}
+                data-skin-primary-button
                 aria-label={primaryLabel}
                 disabled={primaryStops ? stop === undefined : empty || disabled || machineBusy}
                 onMouseDown={keepFocus}
