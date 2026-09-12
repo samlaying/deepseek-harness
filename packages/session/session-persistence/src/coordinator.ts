@@ -287,6 +287,16 @@ function assertSupportedEvents(events: readonly SessionEvent[], id: SessionId): 
   if (fallback !== undefined) {
     throw new Error(`session "${id}" contains unsupported legacy request/header reason "fallback" at seq ${fallback.seq}`)
   }
+  // Antigravity's early adapter emitted a generic `message` envelope.  It is
+  // safe to import only when its role/content/source make the destination
+  // event unambiguous; other unknown event types remain refused below.
+  const genericMessage = events.find(event => (event.type as string) === 'message')
+  if (genericMessage !== undefined) {
+    const data = asRecord(genericMessage.data)
+    if (data?.['role'] !== 'user' && data?.['role'] !== 'assistant') {
+      throw new Error(`session "${id}" contains malformed legacy message event at seq ${genericMessage.seq}`)
+    }
+  }
 }
 
 /** Return an object record without widening arrays into message payloads. */
@@ -466,6 +476,30 @@ function migrateLegacyMessageEvent(
 ): SessionEvent {
   const data = asRecord(event.data)
   if (data === undefined) return event
+  if ((event.type as string) === 'message') {
+    const legacyEvent = event as SessionEvent & { type: string; data: unknown }
+    const legacyData = asRecord(legacyEvent.data)
+    if (legacyData?.['role'] !== 'user' && legacyData?.['role'] !== 'assistant') {
+      throw new Error(`session "${id}" contains malformed legacy message event at seq ${event.seq}`)
+    }
+    if (!Array.isArray(legacyData['content'])) {
+      throw new Error(`session "${id}" contains malformed legacy message event at seq ${event.seq}`)
+    }
+    const role = legacyData['role']
+    const message = {
+      id: legacyMessageId(id, event.seq),
+      role,
+      content: legacyData['content'],
+      source: legacyData['source'] ?? (role === 'assistant'
+        ? { kind: 'model', provider: 'antigravity', model: 'legacy' }
+        : { kind: 'user' }),
+    }
+    return {
+      ...event,
+      type: role === 'user' ? 'user/message' : 'assistant/message',
+      data: role === 'user' ? message : { message },
+    } as SessionEvent
+  }
   switch (event.type) {
     case 'user/message': {
       if (Object.hasOwn(data, 'id') || Object.hasOwn(data, 'role')
@@ -481,6 +515,22 @@ function migrateLegacyMessageEvent(
       } as SessionEvent
     }
     case 'assistant/message': {
+      const currentMessage = asRecord(data['message'])
+      if (currentMessage !== undefined && asRecord(currentMessage['source']) === undefined) {
+        const legacyModel = typeof data['model'] === 'string' ? data['model'] : undefined
+        const legacyMeta = asRecord(data['meta'])
+        const deepseek = asRecord(legacyMeta?.['deepseek'])
+        const provider = typeof deepseek?.['requestModel'] === 'string'
+          ? 'deepseek'
+          : 'antigravity'
+        const model = typeof deepseek?.['responseModel'] === 'string'
+          ? deepseek['responseModel']
+          : legacyModel ?? 'legacy'
+        return {
+          ...event,
+          data: { ...data, message: { ...currentMessage, source: { kind: 'model', provider, model } } },
+        } as SessionEvent
+      }
       if (Object.hasOwn(data, 'message')
         || !Object.hasOwn(data, 'content') || !Object.hasOwn(data, 'provenance')) return event
       const { content, provenance, ...eventData } = data
@@ -541,14 +591,32 @@ function eventMessageId(event: SessionEvent): PersistedMessageId | undefined {
   return typeof message?.['id'] === 'string' ? message['id'] as PersistedMessageId : undefined
 }
 
+/** Renumber repeated turn ids emitted by early Antigravity continuations. */
+function normalizeTurnNumbers(events: readonly SessionEvent[]): SessionEvent[] {
+  let lastTurn = 0
+  let sourceTurn: number | undefined
+  let targetTurn = 0
+  return events.map((event) => {
+    const data = asRecord(event.data)
+    if (event.type === 'turn/start' && data !== undefined && Number.isSafeInteger(data['turn'])) {
+      sourceTurn = data['turn'] as number
+      targetTurn = Math.max(lastTurn + 1, sourceTurn)
+      lastTurn = targetTurn
+    }
+    if (data === undefined || sourceTurn === undefined || data['turn'] !== sourceTurn) return event
+    return { ...event, data: { ...data, turn: targetTurn } } as SessionEvent
+  })
+}
+
 /** Materialize stored events as upgraded, validated snapshots with immutable messages. */
 function snapshotStoredEvents(events: readonly SessionEvent[], id: SessionId): SessionEvent[] {
   assertSupportedEvents(events, id)
   const messageIds = new Map<number, PersistedMessageId>()
-  return events.map((event) => {
-    const migratedStart = migrateLegacyTurnStartEvent(event, id)
-    const migratedTurn = migrateLegacyTurnEndEvent(migratedStart, id)
-    const migratedSteering = migrateLegacySteeringEvent(migratedTurn, id)
+  const normalized = normalizeTurnNumbers(events.map(event => migrateLegacyTurnEndEvent(
+    migrateLegacyTurnStartEvent(event, id), id,
+  )))
+  return normalized.map((event) => {
+    const migratedSteering = migrateLegacySteeringEvent(event, id)
     const snapshot = snapshotSessionEvent(migrateLegacyMessageEvent(migratedSteering, id, messageIds))
     const messageId = eventMessageId(snapshot)
     if (messageId !== undefined) messageIds.set(snapshot.seq, messageId)
@@ -560,10 +628,11 @@ function snapshotStoredEvents(events: readonly SessionEvent[], id: SessionId): S
 function adoptStoredEvents(events: SessionEvent[], id: SessionId): SessionEvent[] {
   assertSupportedEvents(events, id)
   const messageIds = new Map<number, PersistedMessageId>()
-  for (const [index, event] of events.entries()) {
-    const migratedStart = migrateLegacyTurnStartEvent(event, id)
-    const migratedTurn = migrateLegacyTurnEndEvent(migratedStart, id)
-    const migratedSteering = migrateLegacySteeringEvent(migratedTurn, id)
+  const normalized = normalizeTurnNumbers(events.map(event => migrateLegacyTurnEndEvent(
+    migrateLegacyTurnStartEvent(event, id), id,
+  )))
+  for (const [index, event] of normalized.entries()) {
+    const migratedSteering = migrateLegacySteeringEvent(event, id)
     const adopted = adoptSessionEvent(migrateLegacyMessageEvent(migratedSteering, id, messageIds))
     events[index] = adopted
     const messageId = eventMessageId(adopted)
