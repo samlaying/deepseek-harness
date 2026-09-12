@@ -10,8 +10,8 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
         display: 'flex',
         height: '100%',
         width: '100%',
-        background: 'var(--dsw-alias-bg-base, #121316)',
-        color: 'var(--dsw-alias-label-primary, #e6e8eb)',
+        background: 'transparent',
+        color: 'var(--dsw-alias-label-primary, inherit)',
         overflow: 'hidden',
         fontFamily: 'inherit',
       }}
@@ -23,11 +23,12 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
           width: '340px',
           borderRight: '1px solid var(--dsw-alias-border-subtle, rgba(255, 255, 255, 0.08))',
           padding: '18px',
+          paddingBottom: '160px',
           display: 'flex',
           flexDirection: 'column',
           gap: '18px',
           overflowY: 'auto',
-          background: 'var(--dsw-alias-bg-surface, rgba(255, 255, 255, 0.02))',
+          background: 'rgba(255, 255, 255, 0.02)',
         }}
       >
         <div>
@@ -78,6 +79,7 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
         style={{
           flex: 1,
           padding: '24px',
+          paddingBottom: '160px',
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
