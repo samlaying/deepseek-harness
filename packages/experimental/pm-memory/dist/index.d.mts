@@ -39,6 +39,14 @@ declare class PmMemoryService extends Service {
    * Appends a newly formed decision to the Single Source of Truth.
    */
   recordDecision(record: DecisionRecord, projectDir?: string): Promise<void>;
+  /**
+   * Updates or appends stakeholder memory (people memory).
+   */
+  updatePersonMemory(person: PersonMemory, projectDir?: string): Promise<void>;
+  /**
+   * Appends progress, background changes or milestone context to project memory.
+   */
+  appendProjectLog(heading: string, content: string, projectDir?: string): Promise<void>;
 }
 declare function apply(ctx: Context): void;
 //#endregion

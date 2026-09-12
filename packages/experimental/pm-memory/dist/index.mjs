@@ -62,6 +62,30 @@ var PmMemoryService = class extends Service {
 		const line = `- [${record.date}] **${record.decision}** | 决策人: ${record.owner} | 理由: ${record.reason}\n`;
 		await fs.appendFile(decisionFile, line, "utf-8");
 	}
+	/**
+	* Updates or appends stakeholder memory (people memory).
+	*/
+	async updatePersonMemory(person, projectDir) {
+		const memDir = await this.resolveMemoryRoot(projectDir);
+		const peopleFile = path.join(memDir, "人员记忆.md");
+		const card = [
+			`\n#### ${person.name} (${person.role})`,
+			`- 负责范围: ${person.responsibility}`,
+			`- 沟通偏好: ${person.preference}`,
+			`- 当前欠我Action: ${person.pendingActions.join("; ")}`,
+			""
+		].join("\n");
+		await fs.appendFile(peopleFile, card, "utf-8");
+	}
+	/**
+	* Appends progress, background changes or milestone context to project memory.
+	*/
+	async appendProjectLog(heading, content, projectDir) {
+		const memDir = await this.resolveMemoryRoot(projectDir);
+		const contextFile = path.join(memDir, "项目上下文.md");
+		const block = `\n## ${heading}\n\n${content.trim()}\n`;
+		await fs.appendFile(contextFile, block, "utf-8");
+	}
 };
 function apply(ctx) {
 	ctx.plugin(PmMemoryService);
@@ -163,6 +187,97 @@ function apply(ctx) {
 					reason: a.reason
 				});
 				return { status: `[${today}] ${a.decision} (by ${a.owner})` };
+			}
+		});
+		hostCtx.tools.register({
+			name: "pm_update_people",
+			description: "Update or add stakeholder information, responsibility, communication preference, or pending actions in People Memory.",
+			parameters: {
+				type: "object",
+				properties: {
+					name: {
+						type: "string",
+						description: "Name of the team member or stakeholder."
+					},
+					role: {
+						type: "string",
+						description: "Role / title, e.g. 前端/UI 负责人, 服务端架构师."
+					},
+					responsibility: {
+						type: "string",
+						description: "What they own or are responsible for."
+					},
+					preference: {
+						type: "string",
+						description: "Communication preference or working style."
+					},
+					pendingActions: {
+						type: "array",
+						items: { type: "string" },
+						description: "List of pending action items owed to/by this person."
+					}
+				},
+				required: [
+					"name",
+					"role",
+					"responsibility",
+					"preference",
+					"pendingActions"
+				]
+			},
+			output: {
+				schema: {
+					type: "object",
+					properties: { status: { type: "string" } },
+					required: ["status"]
+				},
+				render(_args, value) {
+					return [{
+						type: "text",
+						text: `👥 人员记忆已更新: ${value.status}`
+					}];
+				}
+			},
+			async execute(args) {
+				const a = args;
+				await hostCtx.pmMemory.updatePersonMemory(a);
+				return { status: `${a.name} (${a.role})` };
+			}
+		});
+		hostCtx.tools.register({
+			name: "pm_append_project_log",
+			description: "Append a major context change, milestone progress, or architecture decision to Project Context Memory.",
+			parameters: {
+				type: "object",
+				properties: {
+					heading: {
+						type: "string",
+						description: "Heading for this log, e.g. 2026-09-12 算力计费与WorkBuddy对齐."
+					},
+					content: {
+						type: "string",
+						description: "Detailed context, background, rationale, and impact scope."
+					}
+				},
+				required: ["heading", "content"]
+			},
+			output: {
+				schema: {
+					type: "object",
+					properties: { status: { type: "string" } },
+					required: ["status"]
+				},
+				render(_args, value) {
+					return [{
+						type: "text",
+						text: `📁 项目上下文已沉淀: ${value.status}`
+					}];
+				}
+			},
+			async execute(args) {
+				const a = args;
+				await hostCtx.pmMemory.appendProjectLog(a.heading, a.content);
+				return { status: a.heading };
 			}
 		});
 	});
