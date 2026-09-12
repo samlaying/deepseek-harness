@@ -507,25 +507,25 @@ export class SystemPrompt extends Service {
       throw new Error(`multiple complete prompt sections are active: ${completeSections.map(section => JSON.stringify(section.name)).join(', ')}`)
     }
     let completeSection: AssembledSection | undefined
-    const sections = sectionDefinitions
-      .map((section) => {
+    const sections = await Promise.all(sectionDefinitions
+      .map(async (section) => {
         const assembled = {
           name: section.name,
-          text: typeof section.text === 'function' ? section.text(context) : section.text,
+          text: typeof section.text === 'function' ? await section.text(context) : section.text,
         }
         if (section.complete === true) completeSection = { ...assembled }
         return assembled
-      })
+      }))
     const assembly: PromptAssembly = {
       sections,
       contexts: runtimeContextSuppressed
         ? []
-        : [...contextByName.values()]
+        : await Promise.all([...contextByName.values()]
           .sort((a, b) => a.order - b.order)
-          .map(entry => ({
+          .map(async entry => ({
             name: entry.name,
-            text: typeof entry.text === 'function' ? entry.text(context) : entry.text,
-          })),
+            text: typeof entry.text === 'function' ? await entry.text(context) : entry.text,
+          }))),
       tools: orderTools(collected, this.toolOrder, knownNames),
       variables,
     }
