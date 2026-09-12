@@ -1,0 +1,24 @@
+{
+  "name": "@deepseek-ai/dsh-pm-memory",
+  "version": "0.1.0-rc.5",
+  "description": "PM Workbench Context & Memory System (Project Context, People Memory, Decision Logs, Terminology)",
+  "type": "module",
+  "main": "./lib/index.js",
+  "types": "./lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsdown"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis": "workspace:*"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "workspace:*"
+  },
+  "private": true
+}
