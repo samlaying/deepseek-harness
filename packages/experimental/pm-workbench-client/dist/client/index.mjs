@@ -52,7 +52,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 								color: "#fff",
 								marginBottom: "6px"
 							},
-							children: "阶段: 6/16 灰度发布准备"
+							children: "当前推进: 消费明细与透明化计费"
 						}),
 						/* @__PURE__ */ jsxs("div", {
 							style: {
@@ -62,8 +62,8 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 							},
 							children: [
 								"• ",
-								/* @__PURE__ */ jsx("b", { children: "定位" }),
-								": 从端到端闭环转向引流工具 (站内商业产品导流)"
+								/* @__PURE__ */ jsx("b", { children: "对齐竞品" }),
+								": 对齐 WorkBuddy 算力透明度体验"
 							]
 						}),
 						/* @__PURE__ */ jsxs("div", {
@@ -74,8 +74,8 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 							},
 							children: [
 								"• ",
-								/* @__PURE__ */ jsx("b", { children: "主流程" }),
-								": 职位访谈 → 搜人 → HR审阅 → 推荐产品 (意向/邀约)"
+								/* @__PURE__ */ jsx("b", { children: "核心边界" }),
+								": 仅重任务做前置区间预估，普通对话做后置轻量归因"
 							]
 						}),
 						/* @__PURE__ */ jsxs("div", {
@@ -86,8 +86,8 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 							},
 							children: [
 								"• ",
-								/* @__PURE__ */ jsx("b", { children: "P0卡点" }),
-								": 搜索效果不稳定，关键词生成质量是核心"
+								/* @__PURE__ */ jsx("b", { children: "当前卡点" }),
+								": 流式 SSE 传输中途截断时的 Token 实际扣减逻辑"
 							]
 						})
 					]
@@ -102,143 +102,76 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 						alignItems: "center",
 						gap: "6px"
 					},
-					children: [/* @__PURE__ */ jsx("span", { children: "👥" }), " 人员记忆 (100-bagent 团队分工)"]
+					children: [/* @__PURE__ */ jsx("span", { children: "👥" }), " 人员记忆 (Stakeholders)"]
 				}), /* @__PURE__ */ jsxs("div", {
 					style: {
 						display: "flex",
 						flexDirection: "column",
 						gap: "8px"
 					},
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								background: "rgba(255,255,255,0.04)",
-								border: "1px solid rgba(255,255,255,0.08)",
-								borderRadius: "8px",
-								padding: "10px"
-							},
-							children: [
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "13px",
-										fontWeight: 600,
-										color: "#fff"
-									},
-									children: "张万里 / 花卷 (前端/UI)"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#9da3ae"
-									},
-									children: "偏好: 结构化 UI 清单分批交付"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#ffaa00"
-									},
-									children: "⚠️ 欠我: 交付兑换页面设计稿 (周二)"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								background: "rgba(255,255,255,0.04)",
-								border: "1px solid rgba(255,255,255,0.08)",
-								borderRadius: "8px",
-								padding: "10px"
-							},
-							children: [
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "13px",
-										fontWeight: 600,
-										color: "#fff"
-									},
-									children: "袁金龙 / 瘦头陀 (服务端业务)"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#9da3ae"
-									},
-									children: "负责: 项目-会话绑定、预上线环境"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#ffaa00"
-									},
-									children: "⚠️ 欠我: 确认预上线环境配置与数据初始化耗时"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								background: "rgba(255,255,255,0.04)",
-								border: "1px solid rgba(255,255,255,0.08)",
-								borderRadius: "8px",
-								padding: "10px"
-							},
-							children: [
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "13px",
-										fontWeight: 600,
-										color: "#fff"
-									},
-									children: "董浩 (后端研发)"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#9da3ae"
-									},
-									children: "负责: 访谈摘要生成接口 (三参数契约)"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#00d4ff"
-									},
-									children: "状态: 对接摘要接口与短链跳转中"
-								})
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								background: "rgba(255,255,255,0.04)",
-								border: "1px solid rgba(255,255,255,0.08)",
-								borderRadius: "8px",
-								padding: "10px"
-							},
-							children: [
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "13px",
-										fontWeight: 600,
-										color: "#fff"
-									},
-									children: "肖金华 / 老肖 (匹配系统)"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#9da3ae"
-									},
-									children: "负责: 后羿系统 (预选/模选/意向人选)"
-								}),
-								/* @__PURE__ */ jsx("div", {
-									style: {
-										fontSize: "12px",
-										color: "#00d4ff"
-									},
-									children: "状态: 评估模选维度拆解与推荐策略"
-								})
-							]
-						})
-					]
+					children: [/* @__PURE__ */ jsxs("div", {
+						style: {
+							background: "rgba(255,255,255,0.04)",
+							border: "1px solid rgba(255,255,255,0.08)",
+							borderRadius: "8px",
+							padding: "10px"
+						},
+						children: [
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "13px",
+									fontWeight: 600,
+									color: "#fff"
+								},
+								children: "计费与网关团队"
+							}),
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "12px",
+									color: "#9da3ae"
+								},
+								children: "负责: SSE usage 直吐与明细日志"
+							}),
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "12px",
+									color: "#ffaa00"
+								},
+								children: "⚠️ 欠我: 确认 stream 结尾是否支持直吐 usage 字段 (今日 17:00 前)"
+							})
+						]
+					}), /* @__PURE__ */ jsxs("div", {
+						style: {
+							background: "rgba(255,255,255,0.04)",
+							border: "1px solid rgba(255,255,255,0.08)",
+							borderRadius: "8px",
+							padding: "10px"
+						},
+						children: [
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "13px",
+									fontWeight: 600,
+									color: "#fff"
+								},
+								children: "张万里 / 花卷 (前端/UI)"
+							}),
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "12px",
+									color: "#9da3ae"
+								},
+								children: "负责: 消息气泡末尾消耗 Badge"
+							}),
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "12px",
+									color: "#00d4ff"
+								},
+								children: "待对齐: Hover 浮层展示“提问/回复”Token 拆解样式"
+							})
+						]
+					})]
 				})] }),
 				/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
 					style: {
@@ -258,56 +191,29 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 						borderRadius: "8px",
 						padding: "10px"
 					},
-					children: [
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								fontSize: "12px",
-								color: "#9da3ae",
-								lineHeight: 1.6
-							},
-							children: [
-								"• ",
-								/* @__PURE__ */ jsx("b", { children: "后羿" }),
-								": 猎聘承载简历预选/模选与意向人选的核心系统"
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								fontSize: "12px",
-								color: "#9da3ae",
-								lineHeight: 1.6
-							},
-							children: [
-								"• ",
-								/* @__PURE__ */ jsx("b", { children: "预选/模选" }),
-								": 预选粗筛广撒网，模选大模型逐条核对简历契合度"
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								fontSize: "12px",
-								color: "#9da3ae",
-								lineHeight: 1.6
-							},
-							children: [
-								"• ",
-								/* @__PURE__ */ jsx("b", { children: "JD+" }),
-								": 广义JD (JD文本 + 在线访谈 + 电话访谈 + 动态反馈)"
-							]
-						}),
-						/* @__PURE__ */ jsxs("div", {
-							style: {
-								fontSize: "12px",
-								color: "#9da3ae",
-								lineHeight: 1.6
-							},
-							children: [
-								"• ",
-								/* @__PURE__ */ jsx("b", { children: "上线代号" }),
-								": 曝光(邀约灰度) / 鲁班 / 朱雀 / 夸父"
-							]
-						})
-					]
+					children: [/* @__PURE__ */ jsxs("div", {
+						style: {
+							fontSize: "12px",
+							color: "#9da3ae",
+							lineHeight: 1.6
+						},
+						children: [
+							"• ",
+							/* @__PURE__ */ jsx("b", { children: "AI Pro 回收" }),
+							": 席位回收后剩余月度配额的退回与清算日志"
+						]
+					}), /* @__PURE__ */ jsxs("div", {
+						style: {
+							fontSize: "12px",
+							color: "#9da3ae",
+							lineHeight: 1.6
+						},
+						children: [
+							"• ",
+							/* @__PURE__ */ jsx("b", { children: "预计消耗" }),
+							": 仅对耗时任务标注的参考区间（如 ~5-15 点），非强阻断"
+						]
+					})]
 				})] })
 			]
 		}), /* @__PURE__ */ jsxs("main", {
@@ -353,7 +259,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#fff",
 									marginBottom: "6px"
 								},
-								children: "1. 联调访谈摘要生成接口"
+								children: "1. 确认 SSE 消息级 Usage 字段"
 							}),
 							/* @__PURE__ */ jsx("div", {
 								style: {
@@ -361,7 +267,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#9da3ae",
 									marginBottom: "8px"
 								},
-								children: "下一步动作: 确认三参数(type+job_id+summary)并与董浩接口对齐"
+								children: "下一步动作: 联系网关确认流式完成时是否回传 prompt/completion tokens"
 							}),
 							/* @__PURE__ */ jsx("span", {
 								style: {
@@ -371,7 +277,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									padding: "2px 8px",
 									borderRadius: "4px"
 								},
-								children: "进行中 · 依赖董浩"
+								children: "进行中 · 依赖网关"
 							})
 						]
 					}),
@@ -390,7 +296,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#fff",
 									marginBottom: "6px"
 								},
-								children: "2. 催兑换页面设计稿"
+								children: "2. 走查 WorkBuddy 任务前置预估"
 							}),
 							/* @__PURE__ */ jsx("div", {
 								style: {
@@ -398,7 +304,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#9da3ae",
 									marginBottom: "8px"
 								},
-								children: "下一步动作: 向万里同步周二截止要求，确保周三前端排期落地"
+								children: "下一步动作: 15:00 前截图确认其预估展现是轻量提示还是弹窗强确认"
 							}),
 							/* @__PURE__ */ jsx("span", {
 								style: {
@@ -408,7 +314,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									padding: "2px 8px",
 									borderRadius: "4px"
 								},
-								children: "等待对方 · 万里"
+								children: "今日 DDL 15:00"
 							})
 						]
 					}),
@@ -427,7 +333,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#fff",
 									marginBottom: "6px"
 								},
-								children: "3. 验证导流短链生成与归因"
+								children: "3. 输出难缠用户极端扣费兜底表"
 							}),
 							/* @__PURE__ */ jsx("div", {
 								style: {
@@ -435,7 +341,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#9da3ae",
 									marginBottom: "8px"
 								},
-								children: "下一步动作: 测试带访谈信息与纯跳转短链，同会话闭环统计"
+								children: "下一步动作: 明确网络截断、连续手抖、余额为0时的系统响应机制"
 							}),
 							/* @__PURE__ */ jsx("span", {
 								style: {
@@ -445,7 +351,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									padding: "2px 8px",
 									borderRadius: "4px"
 								},
-								children: "进行中 · 董涛短链"
+								children: "已推导完成"
 							})
 						]
 					})
@@ -460,7 +366,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 					alignItems: "center",
 					gap: "6px"
 				},
-				children: [/* @__PURE__ */ jsx("span", { children: "📝" }), " 100-bagent 关键决策日志 (Single Source of Truth)"]
+				children: [/* @__PURE__ */ jsx("span", { children: "📝" }), " 本次需求机制卡片 (Mechanism Canvas - 对齐 WorkBuddy)"]
 			}), /* @__PURE__ */ jsxs("div", {
 				style: {
 					background: "rgba(255,255,255,0.04)",
@@ -471,12 +377,12 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 				children: [
 					/* @__PURE__ */ jsx("div", {
 						style: {
-							fontSize: "14px",
+							fontSize: "15px",
 							fontWeight: 600,
 							color: "#fff",
 							marginBottom: "8px"
 						},
-						children: "[2026-05-26] 产品定位重大调整：从端到端闭环转向引流工具"
+						children: "消耗明细分类与消息实际消耗展示机制"
 					}),
 					/* @__PURE__ */ jsxs("div", {
 						style: {
@@ -484,7 +390,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 							color: "#e6e8eb",
 							marginBottom: "6px"
 						},
-						children: [/* @__PURE__ */ jsx("b", { children: "决策背景:" }), " 原计划端到端闭环招聘全流程，老板 5/26 提出收窄核心目标为向站内商业产品导流。"]
+						children: [/* @__PURE__ */ jsx("b", { children: "核心取舍:" }), " 红方质询通过——普通对话不做前置预估阻断（保护流畅度），改为气泡轻量 Badge 归因；仅重任务展示「预计消耗区间」。"]
 					}),
 					/* @__PURE__ */ jsxs("div", {
 						style: {
@@ -493,19 +399,19 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 							lineHeight: 1.6
 						},
 						children: [
-							/* @__PURE__ */ jsx("b", { children: "三句话评审口径与机制约束:" }),
+							/* @__PURE__ */ jsx("b", { children: "三句话评审口径:" }),
 							/* @__PURE__ */ jsx("br", {}),
 							"1. ",
 							/* @__PURE__ */ jsx("b", { children: "用户看到什么:" }),
-							" 访谈完成后呈现候选人列表（姓名 + 详情 URL + 引导提示文案，暂不嵌操作按钮）。",
+							" 明细页显示三种分类 Tag（对话/任务/清算）；每条 AI 气泡右下角灰色显示「⚡ 实际消耗 12 点」，Hover 查看详细 Token。",
 							/* @__PURE__ */ jsx("br", {}),
 							"2. ",
 							/* @__PURE__ */ jsx("b", { children: "用户能做什么:" }),
-							" 审阅候选人满意度，满意则根据数量触发商业产品推荐卡片（意向人选/邀约）。",
+							" 在明细列表按类型筛选流水；点击消息气泡消耗能查看费用拆解明细。",
 							/* @__PURE__ */ jsx("br", {}),
 							"3. ",
 							/* @__PURE__ */ jsx("b", { children: "然后发生什么:" }),
-							" 点击链接带访谈摘要跳转至商业化页面，完成导流归因。"
+							" 任务执行完成后，系统自动回写扣减流水，若网络异常截断则仅按实际截断字符扣费。"
 						]
 					})
 				]

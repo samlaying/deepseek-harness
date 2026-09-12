@@ -37,40 +37,28 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
             <span>📁</span> 项目记忆 (Lily / bagent)
           </div>
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '12px' }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>阶段: 6/16 灰度发布准备</div>
-            <div style={{ fontSize: '13px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>定位</b>: 从端到端闭环转向引流工具 (站内商业产品导流)</div>
-            <div style={{ fontSize: '13px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>主流程</b>: 职位访谈 → 搜人 → HR审阅 → 推荐产品 (意向/邀约)</div>
-            <div style={{ fontSize: '13px', color: '#ffaa00', lineHeight: 1.6 }}>• <b>P0卡点</b>: 搜索效果不稳定，关键词生成质量是核心</div>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>当前推进: 消费明细与透明化计费</div>
+            <div style={{ fontSize: '13px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>对齐竞品</b>: 对齐 WorkBuddy 算力透明度体验</div>
+            <div style={{ fontSize: '13px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>核心边界</b>: 仅重任务做前置区间预估，普通对话做后置轻量归因</div>
+            <div style={{ fontSize: '13px', color: '#ffaa00', lineHeight: 1.6 }}>• <b>当前卡点</b>: 流式 SSE 传输中途截断时的 Token 实际扣减逻辑</div>
           </div>
         </div>
 
         <div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: '#00d4ff', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>👥</span> 人员记忆 (100-bagent 团队分工)
+            <span>👥</span> 人员记忆 (Stakeholders)
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px' }}>
+              <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>计费与网关团队</div>
+              <div style={{ fontSize: '12px', color: '#9da3ae' }}>负责: SSE usage 直吐与明细日志</div>
+              <div style={{ fontSize: '12px', color: '#ffaa00' }}>⚠️ 欠我: 确认 stream 结尾是否支持直吐 usage 字段 (今日 17:00 前)</div>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px' }}>
               <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>张万里 / 花卷 (前端/UI)</div>
-              <div style={{ fontSize: '12px', color: '#9da3ae' }}>偏好: 结构化 UI 清单分批交付</div>
-              <div style={{ fontSize: '12px', color: '#ffaa00' }}>⚠️ 欠我: 交付兑换页面设计稿 (周二)</div>
-            </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>袁金龙 / 瘦头陀 (服务端业务)</div>
-              <div style={{ fontSize: '12px', color: '#9da3ae' }}>负责: 项目-会话绑定、预上线环境</div>
-              <div style={{ fontSize: '12px', color: '#ffaa00' }}>⚠️ 欠我: 确认预上线环境配置与数据初始化耗时</div>
-            </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>董浩 (后端研发)</div>
-              <div style={{ fontSize: '12px', color: '#9da3ae' }}>负责: 访谈摘要生成接口 (三参数契约)</div>
-              <div style={{ fontSize: '12px', color: '#00d4ff' }}>状态: 对接摘要接口与短链跳转中</div>
-            </div>
-
-            <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px' }}>
-              <div style={{ fontSize: '13px', fontWeight: 600, color: '#fff' }}>肖金华 / 老肖 (匹配系统)</div>
-              <div style={{ fontSize: '12px', color: '#9da3ae' }}>负责: 后羿系统 (预选/模选/意向人选)</div>
-              <div style={{ fontSize: '12px', color: '#00d4ff' }}>状态: 评估模选维度拆解与推荐策略</div>
+              <div style={{ fontSize: '12px', color: '#9da3ae' }}>负责: 消息气泡末尾消耗 Badge</div>
+              <div style={{ fontSize: '12px', color: '#00d4ff' }}>待对齐: Hover 浮层展示“提问/回复”Token 拆解样式</div>
             </div>
           </div>
         </div>
@@ -80,15 +68,13 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
             <span>📑</span> 内部术语表 (Terminology)
           </div>
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '10px' }}>
-            <div style={{ fontSize: '12px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>后羿</b>: 猎聘承载简历预选/模选与意向人选的核心系统</div>
-            <div style={{ fontSize: '12px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>预选/模选</b>: 预选粗筛广撒网，模选大模型逐条核对简历契合度</div>
-            <div style={{ fontSize: '12px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>JD+</b>: 广义JD (JD文本 + 在线访谈 + 电话访谈 + 动态反馈)</div>
-            <div style={{ fontSize: '12px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>上线代号</b>: 曝光(邀约灰度) / 鲁班 / 朱雀 / 夸父</div>
+            <div style={{ fontSize: '12px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>AI Pro 回收</b>: 席位回收后剩余月度配额的退回与清算日志</div>
+            <div style={{ fontSize: '12px', color: '#9da3ae', lineHeight: 1.6 }}>• <b>预计消耗</b>: 仅对耗时任务标注的参考区间（如 ~5-15 点），非强阻断</div>
           </div>
         </div>
       </aside>
 
-      {/* 右侧动态画布：100-bagent 今日必达 Top 3 + 决策日志 + PRD 机制卡片 */}
+      {/* 右侧动态画布：今日必达 Top 3 + 决策日志 + PRD 机制卡片 */}
       <main
         data-pm-canvas-panel
         style={{
@@ -106,39 +92,39 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px' }}>
             <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>1. 联调访谈摘要生成接口</div>
-              <div style={{ fontSize: '13px', color: '#9da3ae', marginBottom: '8px' }}>下一步动作: 确认三参数(type+job_id+summary)并与董浩接口对齐</div>
-              <span style={{ fontSize: '11px', background: 'rgba(0,212,255,0.15)', color: '#00d4ff', padding: '2px 8px', borderRadius: '4px' }}>进行中 · 依赖董浩</span>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>1. 确认 SSE 消息级 Usage 字段</div>
+              <div style={{ fontSize: '13px', color: '#9da3ae', marginBottom: '8px' }}>下一步动作: 联系网关确认流式完成时是否回传 prompt/completion tokens</div>
+              <span style={{ fontSize: '11px', background: 'rgba(0,212,255,0.15)', color: '#00d4ff', padding: '2px 8px', borderRadius: '4px' }}>进行中 · 依赖网关</span>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>2. 催兑换页面设计稿</div>
-              <div style={{ fontSize: '13px', color: '#9da3ae', marginBottom: '8px' }}>下一步动作: 向万里同步周二截止要求，确保周三前端排期落地</div>
-              <span style={{ fontSize: '11px', background: 'rgba(255,170,0,0.15)', color: '#ffaa00', padding: '2px 8px', borderRadius: '4px' }}>等待对方 · 万里</span>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>2. 走查 WorkBuddy 任务前置预估</div>
+              <div style={{ fontSize: '13px', color: '#9da3ae', marginBottom: '8px' }}>下一步动作: 15:00 前截图确认其预估展现是轻量提示还是弹窗强确认</div>
+              <span style={{ fontSize: '11px', background: 'rgba(255,170,0,0.15)', color: '#ffaa00', padding: '2px 8px', borderRadius: '4px' }}>今日 DDL 15:00</span>
             </div>
             <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '14px' }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>3. 验证导流短链生成与归因</div>
-              <div style={{ fontSize: '13px', color: '#9da3ae', marginBottom: '8px' }}>下一步动作: 测试带访谈信息与纯跳转短链，同会话闭环统计</div>
-              <span style={{ fontSize: '11px', background: 'rgba(0,212,255,0.15)', color: '#00d4ff', padding: '2px 8px', borderRadius: '4px' }}>进行中 · 董涛短链</span>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '6px' }}>3. 输出难缠用户极端扣费兜底表</div>
+              <div style={{ fontSize: '13px', color: '#9da3ae', marginBottom: '8px' }}>下一步动作: 明确网络截断、连续手抖、余额为0时的系统响应机制</div>
+              <span style={{ fontSize: '11px', background: 'rgba(0,212,255,0.15)', color: '#00d4ff', padding: '2px 8px', borderRadius: '4px' }}>已推导完成</span>
             </div>
           </div>
         </div>
 
         <div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: '#00d4ff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span>📝</span> 100-bagent 关键决策日志 (Single Source of Truth)
+            <span>📝</span> 本次需求机制卡片 (Mechanism Canvas - 对齐 WorkBuddy)
           </div>
           <div style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', padding: '16px' }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
-              [2026-05-26] 产品定位重大调整：从端到端闭环转向引流工具
+            <div style={{ fontSize: '15px', fontWeight: 600, color: '#fff', marginBottom: '8px' }}>
+              消耗明细分类与消息实际消耗展示机制
             </div>
             <div style={{ fontSize: '13px', color: '#e6e8eb', marginBottom: '6px' }}>
-              <b>决策背景:</b> 原计划端到端闭环招聘全流程，老板 5/26 提出收窄核心目标为向站内商业产品导流。
+              <b>核心取舍:</b> 红方质询通过——普通对话不做前置预估阻断（保护流畅度），改为气泡轻量 Badge 归因；仅重任务展示「预计消耗区间」。
             </div>
             <div style={{ fontSize: '13px', color: '#9da3ae', lineHeight: 1.6 }}>
-              <b>三句话评审口径与机制约束:</b><br/>
-              1. <b>用户看到什么:</b> 访谈完成后呈现候选人列表（姓名 + 详情 URL + 引导提示文案，暂不嵌操作按钮）。<br/>
-              2. <b>用户能做什么:</b> 审阅候选人满意度，满意则根据数量触发商业产品推荐卡片（意向人选/邀约）。<br/>
-              3. <b>然后发生什么:</b> 点击链接带访谈摘要跳转至商业化页面，完成导流归因。
+              <b>三句话评审口径:</b><br/>
+              1. <b>用户看到什么:</b> 明细页显示三种分类 Tag（对话/任务/清算）；每条 AI 气泡右下角灰色显示「⚡ 实际消耗 12 点」，Hover 查看详细 Token。<br/>
+              2. <b>用户能做什么:</b> 在明细列表按类型筛选流水；点击消息气泡消耗能查看费用拆解明细。<br/>
+              3. <b>然后发生什么:</b> 任务执行完成后，系统自动回写扣减流水，若网络异常截断则仅按实际截断字符扣费。
             </div>
           </div>
         </div>
