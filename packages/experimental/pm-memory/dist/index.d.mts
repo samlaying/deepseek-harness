@@ -1,17 +1,6 @@
 import { Context, Service } from "@deepseek-ai/cordis";
 
 //#region src/index.d.ts
-interface ProjectContext {
-  longTermFacts: string[];
-  coreGoal: string;
-  currentPhase: string;
-  scope: {
-    inScope: string[];
-    outScope: string[];
-  };
-  blockers: string[];
-  risks: string[];
-}
 interface DecisionRecord {
   date: string;
   decision: string;
@@ -38,27 +27,20 @@ declare class PmMemoryService extends Service {
   static readonly inject: never[];
   constructor(ctx: Context);
   /**
-   * Resolve PM workspace memory root directory.
+   * Resolve PM memory root directory.
+   * Defaults to project .pm-memory, falls back to repository data/pm-memory.
    */
-  resolveMemoryRoot(projectDir: string): string;
-  /**
-   * Ensure memory structure directory exists.
-   */
-  ensureMemoryDir(projectDir: string): Promise<string>;
+  resolveMemoryRoot(projectDir?: string): Promise<string>;
   /**
    * Reads the comprehensive PM context to be injected into agent reasoning.
    */
-  readContext(projectDir: string): Promise<string>;
+  readContext(projectDir?: string): Promise<string>;
   /**
    * Appends a newly formed decision to the Single Source of Truth.
    */
-  recordDecision(projectDir: string, record: DecisionRecord): Promise<void>;
-  /**
-   * Records or updates a stakeholder memory item.
-   */
-  recordPerson(projectDir: string, person: PersonMemory): Promise<void>;
+  recordDecision(record: DecisionRecord, projectDir?: string): Promise<void>;
 }
 declare function apply(ctx: Context): void;
 //#endregion
-export { DecisionRecord, PersonMemory, PmMemoryService, ProjectContext, apply };
+export { DecisionRecord, PersonMemory, PmMemoryService, apply };
 //# sourceMappingURL=index.d.mts.map

@@ -10,29 +10,33 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 			width: "100%",
 			background: "var(--dsw-alias-bg-base, #121316)",
 			color: "var(--dsw-alias-label-primary, #e6e8eb)",
-			overflow: "hidden"
+			overflow: "hidden",
+			fontFamily: "inherit"
 		},
 		children: [/* @__PURE__ */ jsxs("aside", {
 			"data-pm-memory-panel": true,
 			style: {
-				width: "320px",
+				width: "340px",
 				borderRight: "1px solid var(--dsw-alias-border-subtle, rgba(255, 255, 255, 0.08))",
-				padding: "16px",
+				padding: "18px",
 				display: "flex",
 				flexDirection: "column",
-				gap: "16px",
+				gap: "18px",
 				overflowY: "auto",
 				background: "var(--dsw-alias-bg-surface, rgba(255, 255, 255, 0.02))"
 			},
 			children: [
-				/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+				/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
 					style: {
 						fontSize: "13px",
 						fontWeight: 600,
 						color: "#00d4ff",
-						marginBottom: "8px"
+						marginBottom: "8px",
+						display: "flex",
+						alignItems: "center",
+						gap: "6px"
 					},
-					children: "📁 项目记忆 (Single Source of Truth)"
+					children: [/* @__PURE__ */ jsx("span", { children: "📁" }), " 项目记忆 (Lily / bagent)"]
 				}), /* @__PURE__ */ jsxs("div", {
 					style: {
 						background: "rgba(255,255,255,0.04)",
@@ -48,154 +52,262 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 								color: "#fff",
 								marginBottom: "6px"
 							},
-							children: "当前推进阶段: MVP 验证"
+							children: "阶段: 6/16 灰度发布准备"
 						}),
-						/* @__PURE__ */ jsx("div", {
+						/* @__PURE__ */ jsxs("div", {
 							style: {
 								fontSize: "13px",
 								color: "#9da3ae",
 								lineHeight: 1.6
 							},
-							children: "• 核心目标: 建立 AI 协作产品经理工作流"
+							children: [
+								"• ",
+								/* @__PURE__ */ jsx("b", { children: "定位" }),
+								": 从端到端闭环转向引流工具 (站内商业产品导流)"
+							]
 						}),
-						/* @__PURE__ */ jsx("div", {
+						/* @__PURE__ */ jsxs("div", {
 							style: {
 								fontSize: "13px",
 								color: "#9da3ae",
 								lineHeight: 1.6
 							},
-							children: "• 当前卡点: 确认企业微信自建应用权限边界"
+							children: [
+								"• ",
+								/* @__PURE__ */ jsx("b", { children: "主流程" }),
+								": 职位访谈 → 搜人 → HR审阅 → 推荐产品 (意向/邀约)"
+							]
 						}),
-						/* @__PURE__ */ jsx("div", {
+						/* @__PURE__ */ jsxs("div", {
 							style: {
 								fontSize: "13px",
-								color: "#9da3ae",
+								color: "#ffaa00",
 								lineHeight: 1.6
 							},
-							children: "• 风险: IM 回调频控与多群聊并发"
+							children: [
+								"• ",
+								/* @__PURE__ */ jsx("b", { children: "P0卡点" }),
+								": 搜索效果不稳定，关键词生成质量是核心"
+							]
 						})
 					]
 				})] }),
-				/* @__PURE__ */ jsxs("div", { children: [
-					/* @__PURE__ */ jsx("div", {
-						style: {
-							fontSize: "13px",
-							fontWeight: 600,
-							color: "#00d4ff",
-							marginBottom: "8px"
-						},
-						children: "👥 人员记忆 (Stakeholders)"
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						style: {
-							background: "rgba(255,255,255,0.04)",
-							border: "1px solid rgba(255,255,255,0.08)",
-							borderRadius: "8px",
-							padding: "12px"
-						},
-						children: [
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "14px",
-									fontWeight: 600,
-									color: "#fff",
-									marginBottom: "6px"
-								},
-								children: "研发负责人 (Alex)"
-							}),
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "13px",
-									color: "#9da3ae",
-									lineHeight: 1.6
-								},
-								children: "偏好: 数据驱动、明确的接口 DDL"
-							}),
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "13px",
-									color: "#ffaa00",
-									lineHeight: 1.6
-								},
-								children: "⚠️ 欠我Action: 确认群聊消息回调与频控 (今日 18:00)"
-							})
-						]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						style: {
-							background: "rgba(255,255,255,0.04)",
-							border: "1px solid rgba(255,255,255,0.08)",
-							borderRadius: "8px",
-							padding: "12px",
-							marginTop: "8px"
-						},
-						children: [
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "14px",
-									fontWeight: 600,
-									color: "#fff",
-									marginBottom: "6px"
-								},
-								children: "业务负责人 (Sarah)"
-							}),
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "13px",
-									color: "#9da3ae",
-									lineHeight: 1.6
-								},
-								children: "偏好: 结论先行、30秒汇报摘要"
-							}),
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "13px",
-									color: "#9da3ae",
-									lineHeight: 1.6
-								},
-								children: "关注点: 员工与 Lily 的私聊体验完整度"
-							})
-						]
-					})
-				] }),
-				/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+				/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
 					style: {
 						fontSize: "13px",
 						fontWeight: 600,
 						color: "#00d4ff",
-						marginBottom: "8px"
+						marginBottom: "8px",
+						display: "flex",
+						alignItems: "center",
+						gap: "6px"
 					},
-					children: "📑 内部专有术语表"
+					children: [/* @__PURE__ */ jsx("span", { children: "👥" }), " 人员记忆 (100-bagent 团队分工)"]
+				}), /* @__PURE__ */ jsxs("div", {
+					style: {
+						display: "flex",
+						flexDirection: "column",
+						gap: "8px"
+					},
+					children: [
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								background: "rgba(255,255,255,0.04)",
+								border: "1px solid rgba(255,255,255,0.08)",
+								borderRadius: "8px",
+								padding: "10px"
+							},
+							children: [
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "13px",
+										fontWeight: 600,
+										color: "#fff"
+									},
+									children: "张万里 / 花卷 (前端/UI)"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#9da3ae"
+									},
+									children: "偏好: 结构化 UI 清单分批交付"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#ffaa00"
+									},
+									children: "⚠️ 欠我: 交付兑换页面设计稿 (周二)"
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								background: "rgba(255,255,255,0.04)",
+								border: "1px solid rgba(255,255,255,0.08)",
+								borderRadius: "8px",
+								padding: "10px"
+							},
+							children: [
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "13px",
+										fontWeight: 600,
+										color: "#fff"
+									},
+									children: "袁金龙 / 瘦头陀 (服务端业务)"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#9da3ae"
+									},
+									children: "负责: 项目-会话绑定、预上线环境"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#ffaa00"
+									},
+									children: "⚠️ 欠我: 确认预上线环境配置与数据初始化耗时"
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								background: "rgba(255,255,255,0.04)",
+								border: "1px solid rgba(255,255,255,0.08)",
+								borderRadius: "8px",
+								padding: "10px"
+							},
+							children: [
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "13px",
+										fontWeight: 600,
+										color: "#fff"
+									},
+									children: "董浩 (后端研发)"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#9da3ae"
+									},
+									children: "负责: 访谈摘要生成接口 (三参数契约)"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#00d4ff"
+									},
+									children: "状态: 对接摘要接口与短链跳转中"
+								})
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								background: "rgba(255,255,255,0.04)",
+								border: "1px solid rgba(255,255,255,0.08)",
+								borderRadius: "8px",
+								padding: "10px"
+							},
+							children: [
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "13px",
+										fontWeight: 600,
+										color: "#fff"
+									},
+									children: "肖金华 / 老肖 (匹配系统)"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#9da3ae"
+									},
+									children: "负责: 后羿系统 (预选/模选/意向人选)"
+								}),
+								/* @__PURE__ */ jsx("div", {
+									style: {
+										fontSize: "12px",
+										color: "#00d4ff"
+									},
+									children: "状态: 评估模选维度拆解与推荐策略"
+								})
+							]
+						})
+					]
+				})] }),
+				/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
+					style: {
+						fontSize: "13px",
+						fontWeight: 600,
+						color: "#00d4ff",
+						marginBottom: "8px",
+						display: "flex",
+						alignItems: "center",
+						gap: "6px"
+					},
+					children: [/* @__PURE__ */ jsx("span", { children: "📑" }), " 内部术语表 (Terminology)"]
 				}), /* @__PURE__ */ jsxs("div", {
 					style: {
 						background: "rgba(255,255,255,0.04)",
 						border: "1px solid rgba(255,255,255,0.08)",
 						borderRadius: "8px",
-						padding: "12px"
+						padding: "10px"
 					},
-					children: [/* @__PURE__ */ jsxs("div", {
-						style: {
-							fontSize: "13px",
-							color: "#9da3ae",
-							lineHeight: 1.6
-						},
-						children: [
-							"• ",
-							/* @__PURE__ */ jsx("b", { children: "Lily" }),
-							": 智能招聘/HR 咨询数字助手"
-						]
-					}), /* @__PURE__ */ jsxs("div", {
-						style: {
-							fontSize: "13px",
-							color: "#9da3ae",
-							lineHeight: 1.6
-						},
-						children: [
-							"• ",
-							/* @__PURE__ */ jsx("b", { children: "SSOT" }),
-							": 单一事实源，所有决策唯一的收敛落点"
-						]
-					})]
+					children: [
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								fontSize: "12px",
+								color: "#9da3ae",
+								lineHeight: 1.6
+							},
+							children: [
+								"• ",
+								/* @__PURE__ */ jsx("b", { children: "后羿" }),
+								": 猎聘承载简历预选/模选与意向人选的核心系统"
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								fontSize: "12px",
+								color: "#9da3ae",
+								lineHeight: 1.6
+							},
+							children: [
+								"• ",
+								/* @__PURE__ */ jsx("b", { children: "预选/模选" }),
+								": 预选粗筛广撒网，模选大模型逐条核对简历契合度"
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								fontSize: "12px",
+								color: "#9da3ae",
+								lineHeight: 1.6
+							},
+							children: [
+								"• ",
+								/* @__PURE__ */ jsx("b", { children: "JD+" }),
+								": 广义JD (JD文本 + 在线访谈 + 电话访谈 + 动态反馈)"
+							]
+						}),
+						/* @__PURE__ */ jsxs("div", {
+							style: {
+								fontSize: "12px",
+								color: "#9da3ae",
+								lineHeight: 1.6
+							},
+							children: [
+								"• ",
+								/* @__PURE__ */ jsx("b", { children: "上线代号" }),
+								": 曝光(邀约灰度) / 鲁班 / 朱雀 / 夸父"
+							]
+						})
+					]
 				})] })
 			]
 		}), /* @__PURE__ */ jsxs("main", {
@@ -206,21 +318,24 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 				overflowY: "auto",
 				display: "flex",
 				flexDirection: "column",
-				gap: "20px"
+				gap: "22px"
 			},
-			children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+			children: [/* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
 				style: {
 					fontSize: "13px",
 					fontWeight: 600,
 					color: "#00d4ff",
-					marginBottom: "12px"
+					marginBottom: "12px",
+					display: "flex",
+					alignItems: "center",
+					gap: "6px"
 				},
-				children: "🎯 Today Must-Happen (今日必须发生的 3 个结果)"
+				children: [/* @__PURE__ */ jsx("span", { children: "🎯" }), " Today Must-Happen (今日必须推动落地的 3 个结果)"]
 			}), /* @__PURE__ */ jsxs("div", {
 				style: {
 					display: "grid",
-					gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-					gap: "12px"
+					gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+					gap: "14px"
 				},
 				children: [
 					/* @__PURE__ */ jsxs("div", {
@@ -238,7 +353,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#fff",
 									marginBottom: "6px"
 								},
-								children: "1. 确认飞书 / 企微产品形态"
+								children: "1. 联调访谈摘要生成接口"
 							}),
 							/* @__PURE__ */ jsx("div", {
 								style: {
@@ -246,7 +361,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#9da3ae",
 									marginBottom: "8px"
 								},
-								children: "下一步动作: 对比私聊/群聊权限限制"
+								children: "下一步动作: 确认三参数(type+job_id+summary)并与董浩接口对齐"
 							}),
 							/* @__PURE__ */ jsx("span", {
 								style: {
@@ -256,7 +371,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									padding: "2px 8px",
 									borderRadius: "4px"
 								},
-								children: "进行中"
+								children: "进行中 · 依赖董浩"
 							})
 						]
 					}),
@@ -275,7 +390,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#fff",
 									marginBottom: "6px"
 								},
-								children: "2. 确定第一版授权流程"
+								children: "2. 催兑换页面设计稿"
 							}),
 							/* @__PURE__ */ jsx("div", {
 								style: {
@@ -283,44 +398,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									color: "#9da3ae",
 									marginBottom: "8px"
 								},
-								children: "下一步动作: 画出 V1 首次进入的扫码鉴权时序图"
-							}),
-							/* @__PURE__ */ jsx("span", {
-								style: {
-									fontSize: "11px",
-									background: "rgba(255,255,255,0.1)",
-									color: "#aaa",
-									padding: "2px 8px",
-									borderRadius: "4px"
-								},
-								children: "待开始"
-							})
-						]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						style: {
-							background: "rgba(255,255,255,0.04)",
-							border: "1px solid rgba(255,255,255,0.08)",
-							borderRadius: "8px",
-							padding: "14px"
-						},
-						children: [
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "14px",
-									fontWeight: 600,
-									color: "#fff",
-									marginBottom: "6px"
-								},
-								children: "3. 拉研发确认技术风险"
-							}),
-							/* @__PURE__ */ jsx("div", {
-								style: {
-									fontSize: "13px",
-									color: "#9da3ae",
-									marginBottom: "8px"
-								},
-								children: "下一步动作: 发出结构化协作消息并等待 Alex 回复"
+								children: "下一步动作: 向万里同步周二截止要求，确保周三前端排期落地"
 							}),
 							/* @__PURE__ */ jsx("span", {
 								style: {
@@ -330,19 +408,59 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 									padding: "2px 8px",
 									borderRadius: "4px"
 								},
-								children: "等待对方"
+								children: "等待对方 · 万里"
+							})
+						]
+					}),
+					/* @__PURE__ */ jsxs("div", {
+						style: {
+							background: "rgba(255,255,255,0.04)",
+							border: "1px solid rgba(255,255,255,0.08)",
+							borderRadius: "8px",
+							padding: "14px"
+						},
+						children: [
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "14px",
+									fontWeight: 600,
+									color: "#fff",
+									marginBottom: "6px"
+								},
+								children: "3. 验证导流短链生成与归因"
+							}),
+							/* @__PURE__ */ jsx("div", {
+								style: {
+									fontSize: "13px",
+									color: "#9da3ae",
+									marginBottom: "8px"
+								},
+								children: "下一步动作: 测试带访谈信息与纯跳转短链，同会话闭环统计"
+							}),
+							/* @__PURE__ */ jsx("span", {
+								style: {
+									fontSize: "11px",
+									background: "rgba(0,212,255,0.15)",
+									color: "#00d4ff",
+									padding: "2px 8px",
+									borderRadius: "4px"
+								},
+								children: "进行中 · 董涛短链"
 							})
 						]
 					})
 				]
-			})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsx("div", {
+			})] }), /* @__PURE__ */ jsxs("div", { children: [/* @__PURE__ */ jsxs("div", {
 				style: {
 					fontSize: "13px",
 					fontWeight: 600,
 					color: "#00d4ff",
-					marginBottom: "12px"
+					marginBottom: "12px",
+					display: "flex",
+					alignItems: "center",
+					gap: "6px"
 				},
-				children: "📝 动态决策与机制卡片 (Mechanism Canvas)"
+				children: [/* @__PURE__ */ jsx("span", { children: "📝" }), " 100-bagent 关键决策日志 (Single Source of Truth)"]
 			}), /* @__PURE__ */ jsxs("div", {
 				style: {
 					background: "rgba(255,255,255,0.04)",
@@ -353,12 +471,12 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 				children: [
 					/* @__PURE__ */ jsx("div", {
 						style: {
-							fontSize: "15px",
+							fontSize: "14px",
 							fontWeight: 600,
 							color: "#fff",
 							marginBottom: "8px"
 						},
-						children: "企微自建应用接入机制 (V1 范围决策)"
+						children: "[2026-05-26] 产品定位重大调整：从端到端闭环转向引流工具"
 					}),
 					/* @__PURE__ */ jsxs("div", {
 						style: {
@@ -366,15 +484,7 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 							color: "#e6e8eb",
 							marginBottom: "6px"
 						},
-						children: [/* @__PURE__ */ jsx("b", { children: "决策内容:" }), " V1 仅上线私聊对话模式，群聊 @Bot 功能顺延至 V2 评估。"]
-					}),
-					/* @__PURE__ */ jsxs("div", {
-						style: {
-							fontSize: "13px",
-							color: "#e6e8eb",
-							marginBottom: "10px"
-						},
-						children: [/* @__PURE__ */ jsx("b", { children: "决策理由:" }), " 群聊回调与消息频控存在安全隐患，私聊已能满足 80% HR 咨询场景。"]
+						children: [/* @__PURE__ */ jsx("b", { children: "决策背景:" }), " 原计划端到端闭环招聘全流程，老板 5/26 提出收窄核心目标为向站内商业产品导流。"]
 					}),
 					/* @__PURE__ */ jsxs("div", {
 						style: {
@@ -383,19 +493,19 @@ function PmWorkbenchView({ sessionId: _sessionId }) {
 							lineHeight: 1.6
 						},
 						children: [
-							/* @__PURE__ */ jsx("b", { children: "三句话评审口径:" }),
+							/* @__PURE__ */ jsx("b", { children: "三句话评审口径与机制约束:" }),
 							/* @__PURE__ */ jsx("br", {}),
 							"1. ",
 							/* @__PURE__ */ jsx("b", { children: "用户看到什么:" }),
-							" 企微工作台「Lily 助手」图标，点击进入 1v1 对话框。",
+							" 访谈完成后呈现候选人列表（姓名 + 详情 URL + 引导提示文案，暂不嵌操作按钮）。",
 							/* @__PURE__ */ jsx("br", {}),
 							"2. ",
 							/* @__PURE__ */ jsx("b", { children: "用户能做什么:" }),
-							" 发送自然语言咨询、点击预设快捷卡片、重试失败消息。",
+							" 审阅候选人满意度，满意则根据数量触发商业产品推荐卡片（意向人选/邀约）。",
 							/* @__PURE__ */ jsx("br", {}),
 							"3. ",
 							/* @__PURE__ */ jsx("b", { children: "然后发生什么:" }),
-							" Lily 即时流式回复，若超时兜底提示人工 HR 联系方式。"
+							" 点击链接带访谈摘要跳转至商业化页面，完成导流归因。"
 						]
 					})
 				]

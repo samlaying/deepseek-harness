@@ -12,24 +12,24 @@ var PmMemoryService = class extends Service {
 		super(ctx, "pmMemory", true);
 	}
 	/**
-	* Resolve PM workspace memory root directory.
+	* Resolve PM memory root directory.
+	* Defaults to project .pm-memory, falls back to repository data/pm-memory.
 	*/
-	resolveMemoryRoot(projectDir) {
-		return path.resolve(projectDir, ".pm-memory");
-	}
-	/**
-	* Ensure memory structure directory exists.
-	*/
-	async ensureMemoryDir(projectDir) {
-		const memDir = this.resolveMemoryRoot(projectDir);
-		await fs.mkdir(memDir, { recursive: true });
-		return memDir;
+	async resolveMemoryRoot(projectDir) {
+		if (projectDir) {
+			const local = path.resolve(projectDir, ".pm-memory");
+			try {
+				await fs.access(local);
+				return local;
+			} catch {}
+		}
+		return path.resolve("/Users/sam/03-Code/01-GitHub/deepseek-harness/data/pm-memory");
 	}
 	/**
 	* Reads the comprehensive PM context to be injected into agent reasoning.
 	*/
 	async readContext(projectDir) {
-		const memDir = await this.ensureMemoryDir(projectDir);
+		const memDir = await this.resolveMemoryRoot(projectDir);
 		const contextFile = path.join(memDir, "项目上下文.md");
 		const peopleFile = path.join(memDir, "人员记忆.md");
 		const decisionFile = path.join(memDir, "关键决策.md");
@@ -37,11 +37,11 @@ var PmMemoryService = class extends Service {
 		const sections = [];
 		try {
 			const c = await fs.readFile(contextFile, "utf-8");
-			sections.push(`### [项目上下文]\n${c.trim()}`);
+			sections.push(`### [项目上下文 (SSOT)]\n${c.trim()}`);
 		} catch {}
 		try {
 			const p = await fs.readFile(peopleFile, "utf-8");
-			sections.push(`### [人员记忆与沟通偏好]\n${p.trim()}`);
+			sections.push(`### [人员记忆与沟通分工]\n${p.trim()}`);
 		} catch {}
 		try {
 			const d = await fs.readFile(decisionFile, "utf-8");
@@ -56,21 +56,11 @@ var PmMemoryService = class extends Service {
 	/**
 	* Appends a newly formed decision to the Single Source of Truth.
 	*/
-	async recordDecision(projectDir, record) {
-		const memDir = await this.ensureMemoryDir(projectDir);
+	async recordDecision(record, projectDir) {
+		const memDir = await this.resolveMemoryRoot(projectDir);
 		const decisionFile = path.join(memDir, "关键决策.md");
 		const line = `- [${record.date}] **${record.decision}** | 决策人: ${record.owner} | 理由: ${record.reason}\n`;
 		await fs.appendFile(decisionFile, line, "utf-8");
-	}
-	/**
-	* Records or updates a stakeholder memory item.
-	*/
-	async recordPerson(projectDir, person) {
-		const memDir = await this.ensureMemoryDir(projectDir);
-		const peopleFile = path.join(memDir, "人员记忆.md");
-		const actions = person.pendingActions.length > 0 ? person.pendingActions.join(", ") : "无";
-		const entry = `\n#### ${person.name} (${person.role})\n- 负责范围: ${person.responsibility}\n- 沟通偏好: ${person.preference}\n- 当前欠我Action: ${actions}\n`;
-		await fs.appendFile(peopleFile, entry, "utf-8");
 	}
 };
 function apply(ctx) {
