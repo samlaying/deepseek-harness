@@ -211,10 +211,10 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
                 <span style={{ fontSize: '11px', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '2px 6px', borderRadius: '4px' }}>👑 PM 已拍板</span>
               </div>
               <div style={{ fontSize: '12px', color: '#9da3ae', marginBottom: '8px' }}>
-                RedTeam 质询: 任务执行预估 10 算力，实际消耗 100 算力会导致客诉争议。
+                RedTeam 质询: 任务执行预估 10 算力，实际消耗 100 算力会导致客诉争议；中途弹窗又会中断流式体验。
               </div>
               <div style={{ background: 'rgba(0, 255, 170, 0.08)', border: '1px solid rgba(0, 255, 170, 0.25)', borderRadius: '6px', padding: '8px 10px', fontSize: '12px', color: '#fff' }}>
-                <b>最终拍板 (选项 A):</b> 采用 P50~P90 区间预估；若超出 150% 立即触发二次熔断弹窗，经用户再次确认后才继续扣费。
+                <b>最终拍板 (选项 B - 事务冻结+静默放行):</b> 启动前先冻结预估额度，超额部分后台静默补扣并在明细账单中打上黄色「超额异常」Tag，绝对不中断生成流。
               </div>
             </div>
           </div>
