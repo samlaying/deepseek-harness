@@ -86,6 +86,52 @@ export function PmWorkbenchView({ sessionId: _sessionId }: PmWorkbenchViewProps)
           gap: '22px',
         }}
       >
+        {/* 多 Agent 协同状态指示条 (Multi-Agent Swarm) */}
+        <div style={{ background: 'rgba(0, 212, 255, 0.05)', border: '1px solid rgba(0, 212, 255, 0.2)', borderRadius: '10px', padding: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 600, color: '#00d4ff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span>🚀</span> PM Multi-Agent 并行协同调度网络 (Swarm Active)
+            </div>
+            <span style={{ fontSize: '11px', background: 'rgba(0, 255, 170, 0.15)', color: '#00ffaa', padding: '2px 8px', borderRadius: '4px', border: '1px solid rgba(0, 255, 170, 0.3)' }}>
+              ⚡ 真正多 Agent 并行 · 专职记忆同步
+            </span>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '10px' }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>🎯</span> Clarify Subagent
+              </div>
+              <div style={{ fontSize: '11px', color: '#9da3ae', marginTop: '4px' }}>需求澄清 · Today Top 3</div>
+              <div style={{ fontSize: '11px', color: '#00ffaa', marginTop: '4px' }}>🟢 就绪 (Ready)</div>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>🛡️</span> RedTeam Subagent
+              </div>
+              <div style={{ fontSize: '11px', color: '#9da3ae', marginTop: '4px' }}>红蓝对抗 · 边界死角兜底</div>
+              <div style={{ fontSize: '11px', color: '#00ffaa', marginTop: '4px' }}>🟢 就绪 (Ready)</div>
+            </div>
+
+            <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)', borderRadius: '6px', padding: '10px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>📊</span> Benchmark Subagent
+              </div>
+              <div style={{ fontSize: '11px', color: '#9da3ae', marginTop: '4px' }}>对标调研 · 对齐 WorkBuddy</div>
+              <div style={{ fontSize: '11px', color: '#00ffaa', marginTop: '4px' }}>🟢 就绪 (Ready)</div>
+            </div>
+
+            <div style={{ background: 'rgba(255, 170, 0, 0.05)', border: '1px solid rgba(255, 170, 0, 0.2)', borderRadius: '6px', padding: '10px' }}>
+              <div style={{ fontSize: '12px', fontWeight: 600, color: '#ffaa00', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span>🧠</span> Memory Agent (专职)
+              </div>
+              <div style={{ fontSize: '11px', color: '#9da3ae', marginTop: '4px' }}>专职维护人员与项目记忆</div>
+              <div style={{ fontSize: '11px', color: '#00d4ff', marginTop: '4px' }}>🔄 实时同步 (SSOT Sync)</div>
+            </div>
+          </div>
+        </div>
+
         <div>
           <div style={{ fontSize: '13px', fontWeight: 600, color: '#00d4ff', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <span>🎯</span> Today Must-Happen (今日必须推动落地的 3 个结果)
