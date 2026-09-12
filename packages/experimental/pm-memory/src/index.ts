@@ -382,13 +382,14 @@ export function apply(ctx: Context): void {
 
   // System Prompt Consumer: Injects PM Single Source of Truth (SSOT) into the model's reasoning
   ctx.inject(['systemPrompt', 'pmMemory'], (hostCtx) => {
+    let cachedContext = ''
+    void hostCtx.pmMemory.readContext().then((value) => { cachedContext = value })
     hostCtx.systemPrompt.section({
       name: 'pm-memory-ssot',
       order: 50, // Between persona (0) and tool guidance (100)
-      text: async () => {
+      text: () => {
         try {
-          const pmContext = await hostCtx.pmMemory.readContext()
-          if (!pmContext) return ''
+          if (!cachedContext) return ''
           return [
             '\n## PM Multi-Agent 协同体系与记忆库 (Single Source of Truth)',
             '你拥有 4 个专业 Subagent 与 1 个并行调度器可供调度：',
@@ -397,7 +398,7 @@ export function apply(ctx: Context): void {
             '3. **Benchmark Subagent (`pm_benchmark_agent`)**: 对标调研与机制设计 Agent（对齐 WorkBuddy 算力与计费心智）',
             '4. **Memory Agent (`pm_memory_agent`)**: 专职项目与人员记忆更新 Agent（负责专职更新维护《人员记忆.md》、《项目上下文.md》、《关键决策.md》）',
             '5. **Parallel Orchestrator (`pm_parallel_intake`)**: 多 Agent 并行分发调度器（并发调度三大分析 Agent，并在收敛后自动唤起 Memory Agent 入库）',
-            '\n' + pmContext,
+            '\n' + cachedContext,
             '',
           ].join('\n')
         } catch {
