@@ -1,4 +1,4 @@
-/** Trajectory toolbar: timeline and ledger fold controls + PM Workbench tab switcher. */
+/** Trajectory toolbar: timeline and ledger fold controls. */
 
 import type { TranslateNS } from '@deepseek-ai/dsh-client-ui-slots'
 import { IconSearchOutline16 } from '@deepseek-ai/dsh-client-ui-primitives'
@@ -28,8 +28,6 @@ export interface TrajectoryToolbarProps {
   onSearchQueryChange: (query: string) => void
   /** Translate a toolbar dictionary key. */
   t: TranslateNS<typeof NS>
-  /** Optional toggle to view PM Workbench mode */
-  onTogglePmWorkbench?: () => void
 }
 
 /**
@@ -49,22 +47,11 @@ export function TrajectoryToolbar({
   searchQuery,
   onSearchQueryChange,
   t,
-  onTogglePmWorkbench,
 }: TrajectoryToolbarProps) {
   return (
     <div className={css.root} role="toolbar" aria-label={t('toolbar.aria')}>
       <div className={css.inner}>
         <div className={css.actions}>
-          {onTogglePmWorkbench && (
-            <button
-              type="button"
-              className={css.action}
-              style={{ background: 'rgba(0, 212, 255, 0.15)', color: '#00d4ff', borderColor: 'rgba(0, 212, 255, 0.3)' }}
-              onClick={onTogglePmWorkbench}
-            >
-              📊 PM 工作台看板
-            </button>
-          )}
           <button
             type="button"
             className={css.toggle}
