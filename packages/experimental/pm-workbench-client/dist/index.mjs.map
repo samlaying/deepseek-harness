@@ -1,0 +1,1 @@
+{"version":3,"file":"index.mjs","names":[],"sources":["../src/index.ts"],"sourcesContent":["import type { Context } from '@deepseek-ai/cordis'\n\nexport function apply(_ctx: Context): void {\n  // Host-side plugin lifecycle if needed\n}\n"],"mappings":";AAEA,SAAgB,MAAM,MAAqB,CAE3C"}
