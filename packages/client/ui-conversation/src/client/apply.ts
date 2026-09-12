@@ -35,6 +35,7 @@ import { queueDockEntry } from './queue/QueueDock.tsx'
 import { ConversationRoot } from './skeleton/ConversationRoot.tsx'
 import { ConversationSession, ConversationSessionHeader } from './skeleton/ConversationSession.tsx'
 import { DetailsPanel } from './skeleton/DetailsPanel.tsx'
+import { PmWorkbenchView } from './skeleton/PmWorkbenchView.tsx'
 import { en, NS, zh, type ConversationKey } from './locales.ts'
 import { registerConversationNodes } from './conversation-nodes/register.ts'
 import { registerChatNodeRenderers } from './chat/register-node-renderers.ts'
@@ -369,6 +370,16 @@ export function apply(ctx: Context): void {
   // approval only blocks one tool call; answering the question first cannot
   // strand the approval (it re-elects the moment the question resolves).
   slots.register({ name: 'conversation.composer', select: selectApproval, priority: 1, locale: NS }, ApprovalPanel)
+
+  // The PM Workbench view tab: second entry of the conversation.view ring.
+  slots.register({
+    name: 'conversation.view',
+    id: 'pm-workbench',
+    order: 10,
+    label: () => 'PM 工作台',
+    locale: NS,
+    inject: (sessionId: SessionId) => ({ sessionId }),
+  }, PmWorkbenchView)
 
   // The chat view: first entry of the ring this package just declared.
   // ChatView owns only the stable ordered Node list. Business renderers are
