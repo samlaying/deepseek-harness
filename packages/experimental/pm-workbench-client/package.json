@@ -1,18 +1,18 @@
 {
   "name": "@deepseek-ai/dsh-pm-workbench-client",
   "version": "0.1.0-rc.5",
-  "description": "PM Workbench Client Tab & Canvas View for DeepSeek Harness",
+  "description": "PM Workbench Client Tab & Canvas View",
   "type": "module",
-  "main": "./lib/index.js",
-  "types": "./lib/types/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./lib/types/index.d.ts",
-      "import": "./lib/index.js"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     },
     "./client": {
-      "types": "./lib/types/client/index.d.ts",
-      "import": "./lib/client.js"
+      "types": "./dist/client/index.d.mts",
+      "import": "./dist/client/index.mjs"
     }
   },
   "scripts": {

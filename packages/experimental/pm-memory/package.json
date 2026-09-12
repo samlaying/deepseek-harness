@@ -1,14 +1,14 @@
 {
   "name": "@deepseek-ai/dsh-pm-memory",
   "version": "0.1.0-rc.5",
-  "description": "PM Workbench Context & Memory System (Project Context, People Memory, Decision Logs, Terminology)",
+  "description": "PM Workbench Context & Memory System",
   "type": "module",
-  "main": "./lib/index.js",
-  "types": "./lib/types/index.d.ts",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./lib/types/index.d.ts",
-      "import": "./lib/index.js"
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
     }
   },
   "scripts": {
