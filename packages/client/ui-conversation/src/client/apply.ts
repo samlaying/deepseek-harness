@@ -376,7 +376,7 @@ export function apply(ctx: Context): void {
     name: 'conversation.view',
     id: 'pm-workbench',
     order: 10,
-    label: () => 'PM 工作台',
+    label: () => t('view.pm-workbench'),
     locale: NS,
     inject: (sessionId: SessionId) => ({ sessionId }),
   }, PmWorkbenchView)
