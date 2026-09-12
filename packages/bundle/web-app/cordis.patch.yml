@@ -102,6 +102,9 @@
     - id: cordis-host-runner
       name: '@deepseek-ai/dsh-cordis-host-runner'
 
+    - id: pm-memory
+      name: '@deepseek-ai/dsh-pm-memory'
+
     # Ordinary provider for the parsed Web flags. Its plugin-level injection
     # waits for cmdlineArgs; no launcher metadata or special row kind is needed.
     - id: web-startup

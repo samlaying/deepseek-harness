@@ -1405,6 +1405,9 @@ importers:
       '@deepseek-ai/dsh-message-feedback':
         specifier: workspace:^
         version: link:../../feedback/message-feedback
+      '@deepseek-ai/dsh-pm-memory':
+        specifier: workspace:^
+        version: link:../../experimental/pm-memory
       '@deepseek-ai/dsh-session-log-export':
         specifier: workspace:^
         version: link:../../session-query/session-log-export
@@ -3940,6 +3943,12 @@ importers:
       '@deepseek-ai/cordis':
         specifier: workspace:*
         version: link:../../../vendor/cordis
+      '@deepseek-ai/dsh-system-prompt':
+        specifier: workspace:^
+        version: link:../../core/system-prompt
+      '@deepseek-ai/dsh-tools':
+        specifier: workspace:^
+        version: link:../../core/tools
 
   packages/experimental/pm-workbench-client:
     dependencies:
