@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PM Workbench — 信息架构比较</title>
+  <style>
+    :root {
+      --ink: #e8eee9;
+      --muted: #93a39a;
+      --line: #26372f;
+      --paper: #111a16;
+      --canvas: #07100c;
+      --forest: #0b1511;
+      --mint: #dff4e6;
+      --mint-strong: #2f8f66;
+      --yellow: #fff1bf;
+      --purple: #e9e5ff;
+      --coral: #ffe3dc;
+      --shadow: 0 20px 60px rgba(0, 0, 0, .35);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: radial-gradient(circle at 50% -10%, #1a3428 0, var(--canvas) 42%); color: var(--ink); font: 14px/1.45 Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    .app { width: min(1440px, calc(100vw - 32px)); height: min(880px, calc(100vh - 92px)); min-height: 660px; margin: 28px auto 64px; overflow: hidden; border: 1px solid #294238; border-radius: 18px; background: var(--paper); box-shadow: var(--shadow); }
+    .topbar { height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; color: #f4f7f4; background: var(--forest); }
+    .brand { display: flex; align-items: center; gap: 11px; font-weight: 700; letter-spacing: -.02em; }
+    .logo { display: grid; width: 28px; height: 28px; place-items: center; color: var(--forest); background: #b9f1c9; border-radius: 9px; font-size: 15px; }
+    .crumb { display: flex; align-items: center; gap: 9px; color: #d6e2da; font-size: 12px; }
+    .crumb strong { color: #fff; font-weight: 600; }
+    .workspace { height: calc(100% - 58px); display: flex; min-width: 0; }
+    .sidebar { width: 264px; flex: 0 0 264px; padding: 18px 12px; border-right: 1px solid var(--line); background: #0d1712; }
+    .smallcaps { color: #7d8982; font-size: 10px; font-weight: 800; letter-spacing: .1em; }
+    .project-title { margin: 8px 8px 16px; font-size: 16px; font-weight: 750; letter-spacing: -.025em; }
+    .nav-item { width: 100%; display: flex; align-items: center; gap: 9px; margin: 3px 0; padding: 9px 10px; border: 0; border-radius: 8px; background: transparent; text-align: left; color: #48534d; }
+    .nav-item:hover, .nav-item.active { background: #e6f3e9; color: #183d30; font-weight: 650; }
+    .nav-dot { width: 8px; height: 8px; border-radius: 50%; background: #a5b3aa; }
+    .nav-item.active .nav-dot { background: var(--mint-strong); box-shadow: 0 0 0 4px #c9eed5; }
+    .nav-count { margin-left: auto; color: #89948e; font-size: 11px; }
+    .subnav { margin: 20px 8px 7px; }
+    .side-note { margin: 28px 6px 0; padding: 12px; border: 1px solid #d9e7dc; border-radius: 10px; color: #436052; background: #eef8f1; font-size: 12px; }
+    .side-note strong { display: block; margin-bottom: 4px; color: #204837; }
+    .tree-label { display: flex; align-items: center; gap: 6px; margin: 12px 8px 3px; color: #7d8982; font-size: 10px; font-weight: 800; letter-spacing: .08em; }
+    .tree-row { display: flex; align-items: center; gap: 7px; margin: 2px 0; padding: 7px 8px; border-radius: 7px; color: #58655e; font-size: 12px; }
+    .tree-row.indent { margin-left: 13px; padding-left: 12px; border-left: 1px solid #d4ded5; }
+    .tree-row.selected { color: #173c31; background: #dff4e6; font-weight: 700; }
+    .tree-row .tree-icon { width: 14px; color: #769184; text-align: center; font-size: 11px; }
+    .tree-row .tree-meta { margin-left: auto; color: #89958d; font-size: 10px; }
+    .main { min-width: 0; flex: 1; overflow: auto; background: #111a16; }
+    .doc { max-width: 840px; margin: 0 auto; padding: 34px 44px 100px; }
+    .eyebrow { display: flex; align-items: center; gap: 8px; color: #5f7066; font-size: 12px; }
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border: 1px solid #cfe0d4; border-radius: 999px; color: #32604a; background: #f0faf3; font-size: 11px; font-weight: 700; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #54ad78; }
+    h1 { margin: 14px 0 8px; font-size: 28px; line-height: 1.22; letter-spacing: -.055em; }
+    h2 { margin: 32px 0 12px; font-size: 16px; letter-spacing: -.025em; }
+    .lead { max-width: 700px; margin: 0; color: var(--muted); font-size: 14px; }
+    .state-ribbon { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 26px; overflow: hidden; border: 1px solid var(--line); border-radius: 11px; background: var(--line); }
+    .state { min-height: 78px; padding: 12px; background: #fff; }
+    .state b { display: block; margin-bottom: 4px; font-size: 12px; }
+    .state span { color: var(--muted); font-size: 11px; }
+    .state.ok b::before, .state.warn b::before, .state.todo b::before, .state.hold b::before { display: inline-block; width: 7px; height: 7px; margin-right: 6px; border-radius: 50%; content: ""; }
+    .state.ok b::before { background: #48a871; }.state.warn b::before { background: #e8aa3f; }.state.todo b::before { background: #8a8fb3; }.state.hold b::before { background: #c56d67; }
+    .needs { display: grid; gap: 10px; }
+    .need { display: grid; grid-template-columns: 25px 1fr; gap: 10px; padding: 13px; border: 1px solid #e4e8e3; border-radius: 10px; background: #fcfdfb; }
+    .need-num { display: grid; width: 24px; height: 24px; place-items: center; color: #2c7653; background: var(--mint); border-radius: 7px; font-size: 11px; font-weight: 800; }
+    .need strong { display: block; font-size: 13px; }.need p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }
+    .directions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .direction { position: relative; padding: 16px; border: 1px solid #dce5dc; border-radius: 12px; background: #fff; text-align: left; transition: .18s ease; }
+    .direction:hover, .direction.selected { border-color: #6ec18e; box-shadow: 0 8px 20px rgba(40, 125, 76, .11); transform: translateY(-1px); }
+    .direction-tag { display: inline-block; margin-bottom: 9px; padding: 3px 7px; border-radius: 5px; background: var(--purple); color: #4e467a; font-size: 10px; font-weight: 800; }.direction:nth-child(2) .direction-tag { background: var(--yellow); color: #775e14; }
+    .direction h3 { margin: 0 0 6px; font-size: 14px; }.direction p { margin: 0; color: var(--muted); font-size: 12px; }.direction .risk { display: block; margin-top: 10px; color: #915d37; font-size: 11px; }
+    .agent { width: 310px; flex: 0 0 310px; padding: 16px; border-left: 1px solid var(--line); background: #0d1712; transition: width .22s ease, padding .22s ease; }
+    .agent.hidden { width: 0; flex-basis: 0; padding: 16px 0; overflow: hidden; border-left: 0; }
+    .agent-header { display: flex; align-items: center; justify-content: space-between; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
+    .agent-header b { font-size: 13px; }.icon-btn { display: grid; width: 27px; height: 27px; place-items: center; border: 1px solid #d6ded7; border-radius: 7px; background: #fff; color: #607067; }
+    .agent-intro { margin: 14px 0; padding: 12px; border-radius: 10px; color: #315543; background: #edf8f0; font-size: 12px; }.agent-intro b { display: block; margin-bottom: 3px; }
+    .agent-list { display: grid; gap: 8px; }.agent-task { padding: 11px 10px; border: 1px solid #e0e7e1; border-radius: 9px; background: #fff; }.agent-task small { display: block; color: #7b887f; font-size: 10px; }.agent-task strong { display: block; margin-top: 3px; font-size: 12px; }.agent-task p { margin: 4px 0 0; color: var(--muted); font-size: 11px; }
+    .agent-action { width: 100%; margin-top: 14px; padding: 9px; border: 1px solid #255f43; border-radius: 8px; color: #fff; background: #266547; font-weight: 650; font-size: 12px; }
+    .agent-output { display: none; margin-top: 10px; padding: 10px; border-radius: 8px; color: #3f5f4e; background: #f1f5f0; font-size: 11px; }.agent-output.show { display: block; }
+    .chat-feed { display: grid; gap: 9px; margin: 13px 0; max-height: 280px; overflow: auto; }
+    .chat-line { padding: 9px 10px; border-radius: 9px; background: #f2f6f2; color: #4e5f54; font-size: 11px; }
+    .chat-line.user { background: #e4f5e9; color: #28533d; }
+    .chat-line b { display: block; margin-bottom: 3px; color: #2b6e4c; font-size: 10px; }
+    .chat-compose { display: flex; gap: 6px; align-items: flex-end; margin-top: 10px; }
+    .chat-compose textarea { width: 100%; min-height: 55px; resize: vertical; padding: 8px; border: 1px solid #d6e0d7; border-radius: 8px; outline: none; background: #fff; color: var(--ink); font: inherit; font-size: 11px; }
+    .chat-compose textarea:focus { border-color: #63ad7f; box-shadow: 0 0 0 3px #e2f4e7; }
+    .chat-send { width: 42px; height: 34px; border: 0; border-radius: 8px; color: #fff; background: #266547; font-weight: 700; }
+    .run-rail { display: flex; align-items: center; gap: 5px; margin: 22px 0 28px; overflow: auto; white-space: nowrap; }
+    .run-step { display: inline-flex; align-items: center; gap: 6px; padding: 7px 9px; border: 1px solid #dce5dd; border-radius: 8px; color: #7b887f; background: #fff; font-size: 11px; }
+    .run-step.done { color: #276447; border-color: #b8ddc3; background: #edf8f0; }.run-step.active { color: #fff; border-color: #245f43; background: #266547; font-weight: 700; }.run-arrow { color: #a7b2aa; }
+    .run-input { padding: 16px; border: 1px solid #dce6dd; border-radius: 12px; background: #fbfdfb; }.run-input label { display: block; margin-bottom: 8px; color: #718078; font-size: 10px; font-weight: 800; letter-spacing: .08em; }.run-input p { margin: 0; font-size: 14px; line-height: 1.55; }.run-meta { display: flex; gap: 7px; margin-top: 12px; color: #77847b; font-size: 11px; }.run-meta span { padding: 3px 7px; border-radius: 5px; background: #eef3ee; }
+    .plan-box { margin-top: 16px; padding: 17px; border: 1px solid #cfe1d3; border-radius: 12px; background: #f4fbf5; }.plan-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }.plan-head h3 { margin: 0; font-size: 15px; }.plan-head small { color: #5e7466; font-size: 10px; }.plan-copy { margin: 9px 0 14px; color: #52655a; font-size: 12px; }.plan-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }.agent-job { padding: 11px; border: 1px solid #dbe7dc; border-radius: 9px; background: #fff; }.agent-job b { display: block; font-size: 12px; }.agent-job span { display: block; margin-top: 4px; color: #6b796f; font-size: 11px; }.agent-job em { display: inline-block; margin-top: 7px; padding: 2px 6px; border-radius: 4px; color: #4b6b56; background: #e8f5eb; font-size: 10px; font-style: normal; }.agent-job.pending em { color: #79622d; background: #fff1c9; }.plan-actions { display: flex; gap: 8px; margin-top: 14px; }.plan-actions button { padding: 8px 11px; border: 1px solid #b9d6bf; border-radius: 7px; background: #fff; color: #286046; font-size: 11px; font-weight: 650; }.plan-actions .primary { color: #fff; border-color: #266547; background: #266547; }
+    .synthesis-box { margin-top: 18px; padding: 15px; border: 1px solid #e3dfc9; border-radius: 11px; background: #fffaf0; }.synthesis-box h3 { margin: 0 0 8px; font-size: 13px; }.synthesis-box p { margin: 0; color: #6d6548; font-size: 12px; }.persist-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }.persist-row button { padding: 7px 9px; border: 1px solid #d9d5bd; border-radius: 7px; background: #fff; color: #6b5d29; font-size: 11px; }
+
+    /* Variant 2: Conversation-first */
+    .conversation-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr) 300px; height: 100%; }
+    .thread-nav { padding: 20px 14px; border-right: 1px solid var(--line); background: #f7f9f7; }.thread-nav h2 { margin: 6px 4px 18px; font-size: 15px; }.thread-step { position: relative; margin: 0 0 5px 12px; padding: 8px 6px 14px 22px; color: #68746d; font-size: 12px; }.thread-step::before { position: absolute; top: 10px; left: 0; width: 9px; height: 9px; border: 2px solid #c9d2cc; border-radius: 50%; background: #fff; content: ""; }.thread-step::after { position: absolute; top: 21px; left: 4px; width: 2px; height: calc(100% - 3px); background: #dce4dd; content: ""; }.thread-step:last-child::after { display: none; }.thread-step.done::before { border-color: #4aa675; background: #4aa675; }.thread-step.active { color: #173d2f; font-weight: 700; }.thread-step.active::before { border-color: #255f43; box-shadow: 0 0 0 4px #d5f0df; }
+    .mini-context { margin: 10px 4px 18px; padding: 9px; border: 1px solid #dce5dd; border-radius: 8px; color: #496052; background: #fff; font-size: 10px; line-height: 1.6; }.mini-context b { display: block; color: #204b37; font-size: 11px; }
+    .conversation { min-width: 0; overflow: auto; padding: 28px 8%; background: #fff; }.chat-title { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }.chat-title h1 { margin: 4px 0 0; font-size: 24px; }.chat-title p { margin: 4px 0; color: var(--muted); font-size: 12px; }.msg { display: flex; gap: 10px; max-width: 680px; margin: 15px 0; }.avatar { display: grid; width: 28px; height: 28px; flex: 0 0 28px; place-items: center; border-radius: 9px; color: #fff; background: #2d7552; font-size: 11px; font-weight: 800; }.msg.user { margin-left: 38px; }.msg.user .avatar { order: 2; color: #57645d; background: #e8ece8; }.bubble { padding: 11px 13px; border-radius: 4px 12px 12px; background: #f2f6f2; color: #29342e; font-size: 13px; }.msg.user .bubble { border-radius: 12px 4px 12px 12px; background: #e3f5e9; }.bubble p { margin: 0; }.plan-card { margin: 8px 0 0; padding: 12px; border: 1px solid #d7e5db; border-radius: 9px; background: #fff; }.plan-card strong { display: block; font-size: 12px; }.plan-card ul { margin: 7px 0 0; padding-left: 17px; color: #5b6d62; font-size: 11px; }.chat-actions { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0 0 38px; }.chat-actions button { padding: 7px 9px; border: 1px solid #cfddd2; border-radius: 7px; background: #fff; color: #2c6347; font-size: 11px; }.chat-actions button:hover { background: #edf8f0; }
+    .draft-panel { padding: 20px 14px; border-left: 1px solid var(--line); background: #fbfcfa; }.draft-panel h2 { margin: 7px 0 14px; font-size: 15px; }.mini-doc { padding: 14px; border: 1px solid #dce4dc; border-radius: 11px; background: #fff; box-shadow: 0 5px 14px rgba(40, 60, 47, .04); }.mini-doc h3 { margin: 0 0 10px; font-size: 13px; }.mini-row { display: flex; gap: 7px; padding: 8px 0; border-top: 1px solid #edf0ed; color: #56655c; font-size: 11px; }.mini-key { flex: 0 0 48px; color: #879189; font-weight: 700; }.insight { margin-top: 16px; padding: 12px; border-radius: 9px; color: #684e22; background: #fff5d6; font-size: 11px; }.insight b { display: block; margin-bottom: 4px; }
+
+    /* Variant 3: Canvas-first */
+    .canvas-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr) 290px; height: 100%; }.canvas-left { padding: 18px 14px; border-right: 1px solid var(--line); background: #f7f9f7; }.canvas-left h2 { margin: 7px 5px 14px; font-size: 15px; }.legend { display: grid; gap: 9px; margin: 0 5px; }.legend-item { display: flex; align-items: center; gap: 8px; color: #58665e; font-size: 12px; }.legend-swatch { width: 12px; height: 12px; border-radius: 4px; }.canvas-hint { margin: 25px 5px; padding: 11px; border-left: 3px solid #7ec79c; color: #56675d; background: #eef7f0; font-size: 11px; }
+    .mind-canvas { position: relative; overflow: hidden; background: radial-gradient(circle at 72% 18%, #fbfffb 0 8%, transparent 35%), linear-gradient(135deg, #f6f9f5, #edf3ed); }.mind-canvas::before { position: absolute; inset: 0; opacity: .55; background-image: radial-gradient(#c8d5ca 1px, transparent 1px); background-size: 20px 20px; content: ""; }.canvas-top { position: absolute; z-index: 2; top: 22px; left: 28px; right: 28px; display: flex; justify-content: space-between; align-items: center; }.canvas-top h1 { margin: 0; font-size: 22px; }.canvas-top p { margin: 3px 0 0; color: var(--muted); font-size: 12px; }.zoom { display: flex; gap: 5px; }.zoom button { width: 28px; height: 28px; border: 1px solid #d5ddd6; border-radius: 7px; background: #fff; }
+    .links { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }.link { fill: none; stroke: #b7cbbb; stroke-width: 2; }.link.hot { stroke: #53aa77; stroke-width: 3; }
+    .node { position: absolute; z-index: 1; width: 170px; padding: 13px; border: 1px solid #d5dfd6; border-radius: 12px; background: rgba(255,255,255,.94); box-shadow: 0 8px 20px rgba(37, 69, 48, .07); text-align: left; transition: .18s ease; }.node:hover, .node.selected { border-color: #4daf75; box-shadow: 0 12px 25px rgba(37, 104, 66, .16); transform: translateY(-2px); }.node small { display: block; margin-bottom: 5px; color: #78847d; font-size: 10px; font-weight: 800; letter-spacing: .06em; }.node strong { display: block; font-size: 13px; }.node span { display: block; margin-top: 4px; color: #69766f; font-size: 11px; }.node.capacity { top: 152px; left: 9%; background: #f4f2ff; }.node.scene { top: 335px; left: 12%; background: #fffaf0; }.node.need-node { top: 234px; left: 38%; width: 190px; background: #fff; }.node.direction-a { top: 128px; right: 10%; background: #ebf8ef; }.node.direction-b { top: 373px; right: 8%; background: #fff2ec; }.node.question { top: 544px; left: 44%; width: 185px; background: #fff8d9; }
+    .inspector { padding: 20px 14px; border-left: 1px solid var(--line); background: #fbfcfa; }.inspector h2 { margin: 7px 0 14px; font-size: 15px; }.inspect-card { padding: 14px; border: 1px solid #dce4dc; border-radius: 11px; background: #fff; }.inspect-card small { color: #718078; font-size: 10px; font-weight: 800; letter-spacing: .08em; }.inspect-card h3 { margin: 6px 0; font-size: 15px; }.inspect-card p { margin: 0; color: #627067; font-size: 12px; }.inspect-list { display: grid; gap: 8px; margin-top: 14px; }.inspect-list div { padding: 9px; border-radius: 8px; background: #f2f6f2; color: #53645a; font-size: 11px; }.inspect-list b { display: block; color: #224a37; font-size: 11px; }
+
+    /* Variant picker — persistent and intentionally separate from the prototype. */
+    #variant-picker { display: none; position: fixed; z-index: 20; left: 50%; bottom: 18px; transform: translateX(-50%); align-items: center; gap: 4px; padding: 5px; border: 1px solid rgba(37, 55, 44, .12); border-radius: 12px; background: rgba(255,255,255,.92); box-shadow: 0 12px 32px rgba(21, 39, 28, .16); backdrop-filter: blur(12px); }
+    #variant-picker button { min-width: 74px; padding: 8px 10px; border: 0; border-radius: 8px; background: transparent; color: #617067; font-size: 12px; }
+    #variant-picker button[aria-pressed="true"] { color: #fff; background: #245e43; font-weight: 700; }
+    #variant-picker .hint { padding: 0 8px; color: #849087; font-size: 10px; }
+    .variant-kicker { position: fixed; z-index: 19; top: 14px; left: 50%; transform: translateX(-50%); padding: 5px 9px; border-radius: 999px; color: #607066; background: rgba(255,255,255,.72); font-size: 11px; }
+    @media (max-width: 980px) { .app { width: calc(100vw - 20px); height: calc(100vh - 72px); margin-top: 16px; }.agent { width: 270px; flex-basis: 270px; }.conversation-layout { grid-template-columns: 165px minmax(0, 1fr) 270px; }.draft-panel, .canvas-left { display: none; }.canvas-layout { grid-template-columns: minmax(0, 1fr) 255px; }.doc { padding: 28px 26px 80px; }.state-ribbon { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 480px) { .topbar { padding: 0 13px; }.crumb { display: none; }.sidebar, .thread-nav, .inspector { display: none; }.directions { grid-template-columns: 1fr; }.state-ribbon { grid-template-columns: 1fr; }.conversation-layout, .canvas-layout { display: block; }.conversation { padding: 22px 16px 90px; }.mind-canvas { height: 100%; }.node { transform: scale(.82); transform-origin: top left; }.node.capacity { left: 0; }.node.scene { left: 4%; }.node.need-node { left: 27%; }.node.direction-a { right: -6%; }.node.direction-b { right: -7%; }.node.question { left: 31%; }.canvas-top { left: 16px; right: 16px; }.canvas-top h1 { font-size: 18px; } }
+  </style>
+</head>
+<body>
+  <div class="variant-kicker" id="variant-kicker">PROJECT COCKPIT · 思考驾驶舱</div>
+  <main class="app" id="stage"></main>
+  <nav id="variant-picker" aria-label="切换方案">
+    <button type="button" data-variant="1" aria-pressed="true">1 工作台</button>
+    <button type="button" data-variant="2" aria-pressed="false">2 对话</button>
+    <button type="button" data-variant="3" aria-pressed="false">3 画布</button>
+    <span class="hint">← → / 1 2 3</span>
+  </nav>
+  <script>
+    const stage = document.querySelector('#stage');
+    const names = ['工作台优先', '对话优先', '关系画布优先'];
+    let current = Number(new URLSearchParams(location.search).get('v')) || 1;
+
+    const topbar = () => `
+      <header class="topbar">
+        <div class="brand"><span class="logo">L</span> Lily · PM Workbench</div>
+        <div class="crumb"><span>招聘智能体</span><span>›</span><strong>IM 接入</strong><span>›</span><span>方向研究</span></div>
+      </header>`;
+
+    function workbench() {
+      return `${topbar()}<section class="workspace">
+        <aside class="sidebar">
+          <div class="smallcaps">WORKSPACE</div><div class="project-title">猎聘智能体平台</div>
+          <div class="tree-row"><span class="tree-icon">⌂</span>工作空间总览 <span class="tree-meta">4</span></div>
+          <div class="tree-label">PRODUCTS</div>
+          <div class="tree-row"><span class="tree-icon">▾</span><strong>Lily 招聘智能体</strong></div>
+          <div class="tree-row indent"><span class="tree-icon">◆</span>IM 接入 <span class="tree-meta">研究中</span></div>
+          <div class="tree-row indent"><span class="tree-icon">◇</span>猎点透明化 <span class="tree-meta">评审中</span></div>
+          <div class="tree-row indent"><span class="tree-icon">◇</span>招聘数据闭环</div>
+          <div class="tree-label">CURRENT PROJECT · IM 接入</div>
+          <button class="nav-item active" data-section="research"><span class="nav-dot"></span>方向研究 <span class="nav-count">进行中</span></button>
+          <button class="nav-item" data-section="state"><span class="nav-dot"></span>全量状态 <span class="nav-count">12</span></button>
+          <button class="nav-item" data-section="evidence"><span class="nav-dot"></span>证据与约束 <span class="nav-count">8</span></button>
+          <button class="nav-item" data-section="decision"><span class="nav-dot"></span>待对齐决策 <span class="nav-count">3</span></button>
+          <div class="smallcaps subnav">ARTIFACTS</div>
+          <button class="nav-item"><span class="nav-dot"></span>领导沟通稿</button>
+          <button class="nav-item"><span class="nav-dot"></span>PRD 草稿</button>
+          <div class="side-note"><strong>研究阶段</strong>先确认“IM 为什么需要存在”，再讨论入口、通知与连接器。</div>
+        </aside>
+        <article class="main"><div class="doc" id="doc-content">
+          <div class="eyebrow"><span class="pill"><span class="dot"></span>方向研究中</span><span>最后更新 · 今天 15:42</span></div>
+          <h1>IM 接入真正要解决的，<br><em style="color:#76d69a;font-style:normal">不是多一个聊天窗口</em></h1>
+          <p class="lead">项目思考驾驶舱 · 把模糊需求拆成事实、分歧和判断，再决定要不要写 PRD。</p>
+          <div class="state-ribbon">
+            <div class="state ok"><b>现有能力</b><span>职位、人才搜索、沟通、招聘看板已具备</span></div>
+            <div class="state warn"><b>平台限制</b><span>微信不可读取企业上下文；异步通知受限</span></div>
+            <div class="state todo"><b>待验证</b><span>用户是否愿意在 IM 中开始复杂招聘任务</span></div>
+            <div class="state hold"><b>未决边界</b><span>企业资料授权、消息留存与会话归属</span></div>
+          </div>
+          <h2>真实未被满足的诉求</h2>
+          <div class="needs">
+            <div class="need"><div class="need-num">01</div><div><strong>任务不应因离开 PC 而中断</strong><p>HR 在会议、面试和路上收到需求，能快速派给 Lily，结果完成后能回到同一上下文。</p></div></div>
+            <div class="need"><div class="need-num">02</div><div><strong>企业资料不该靠反复转述</strong><p>会议纪要、职位说明和组织信息，需要在明确授权下成为可引用的招聘上下文。</p></div></div>
+            <div class="need"><div class="need-num">03</div><div><strong>通知应服务招聘节奏，而非制造打扰</strong><p>候选人有回复、长任务完成、岗位卡点出现时，才有值得被推送的变化。</p></div></div>
+          </div>
+          <h2>带去与领导对齐的两个方向</h2>
+          <div class="directions">
+            <button class="direction selected"><span class="direction-tag">方向 A · 招聘工作入口</span><h3>从 IM 接收任务，回到 Lily 完成复杂闭环</h3><p>IM 做轻量发起、进度和结果提醒；人才筛选、批量沟通等复杂工作落在主站。</p><span class="risk">需确认：是否接受跨端完成任务</span></button>
+            <button class="direction"><span class="direction-tag">方向 B · 企业上下文入口</span><h3>把已授权的文档与妙记转为可追溯上下文</h3><p>优先解决“理解需求”而非“多一个发消息入口”，由授权范围控制可见性。</p><span class="risk">需确认：资料权限与可引用边界</span></button>
+          </div>
+        </div></article>
+        <aside class="agent" id="agent-sidecar">
+          <div class="agent-header"><b>Lily 对话</b><button class="icon-btn" id="collapse-agent" title="收起侧栏">›</button></div>
+          <div class="agent-intro"><b>你正在查看：IM 接入 · 方向研究</b>我会围绕当前项目回答，也能把结论写回研究稿。</div>
+          <div class="chat-feed" id="side-chat"><div class="chat-line"><b>Lily</b>这个项目目前有 3 个未满足诉求，最关键的是任务和企业上下文不能断裂。</div><div class="chat-line user"><b>你</b>帮我看看下一步先研究什么。</div><div class="chat-line"><b>Lily</b>先研究平台能力与招聘场景的交集，再决定首期做“任务入口”还是“上下文入口”。</div></div>
+          <div class="chat-compose"><textarea id="side-input" placeholder="问 Lily 当前项目…"></textarea><button class="chat-send" id="side-send">↑</button></div>
+          <button class="agent-action" id="align-brief">把当前结论整理成沟通稿</button><div class="agent-output" id="agent-output">已整理为：项目背景、状态、未满足诉求、两个方向、待拍板问题。</div>
+        </aside>
+      </section>`;
+    }
+
+    function conversation() {
+      return `${topbar()}<section class="conversation-layout">
+        <aside class="thread-nav"><div class="smallcaps">WORKSPACE / PRODUCT / PROJECT</div><div class="mini-context"><b>猎聘智能体平台</b>↳ Lily 招聘智能体<br>↳ IM 接入 · 当前项目</div><div class="smallcaps">研究推进</div><h2>从模糊需求到方向</h2>
+          <div class="thread-step done">需求原话</div><div class="thread-step done">梳理现有能力与影响面</div><div class="thread-step active">招聘场景 × IM 作用</div><div class="thread-step">形成多个方向</div><div class="thread-step">与领导对齐</div>
+        </aside>
+        <section class="conversation" id="conversation">
+          <div class="chat-title"><div><div class="eyebrow"><span class="pill"><span class="dot"></span>研究模式</span></div><h1>先理解 IM 在招聘里发生什么</h1><p>Agent 把过程收束为研究对象和待确认的问题。</p></div></div>
+          <div class="msg user"><div class="bubble"><p>给 Lily 接飞书、企微、钉钉、微信。用户能在 IM 里派活，也能读取企业文档。</p></div><div class="avatar">你</div></div>
+          <div class="msg"><div class="avatar">L</div><div><div class="bubble"><p>我先不写“做连接器”。这个需求至少包含：远程派活、任务通知、企业上下文三个目标，它们的入口和限制不同。</p></div><div class="plan-card"><strong>本轮研究计划</strong><ul><li>盘点 Lily 已有招聘闭环，以及 IM 会影响到的对象</li><li>还原 HR 在 IM 中接收需求、推动招聘、同步结果的时刻</li><li>比较平台能力与授权边界，再提出方向</li></ul></div></div></div>
+          <div class="msg"><div class="avatar">L</div><div class="bubble"><p>已发现一个关键分叉：若目标是“手机上发起”，主站仍是复杂操作终点；若目标是“读懂企业”，连接器首先是上下文入口。它们不能共用一套成功指标。</p></div></div>
+          <div class="chat-actions"><button data-chat-action="state">补齐全量状态</button><button data-chat-action="directions">列出两个方向</button><button data-chat-action="brief">生成沟通提纲</button></div>
+        </section>
+        <aside class="draft-panel"><div class="smallcaps">正在形成的产物</div><h2>方向研究稿</h2><div class="mini-doc"><h3>当前结论</h3><div class="mini-row"><span class="mini-key">诉求</span><span>不中断招聘工作；减少需求转述；在关键节点通知</span></div><div class="mini-row"><span class="mini-key">证据</span><span>主站能力清单、平台权限差异、HR 使用场景</span></div><div class="mini-row"><span class="mini-key">未知</span><span>复杂任务跨端完成率；资料授权接受度</span></div><div class="mini-row"><span class="mini-key">下一步</span><span id="draft-next">补齐“各平台能驱动什么”</span></div></div><div class="insight"><b>这个界面的代价</b>对话适合快速澄清，但研究材料会分散。右侧必须持续把结论收束成可复用对象。</div></aside>
+      </section>`;
+    }
+
+    function canvas() {
+      return `${topbar()}<section class="canvas-layout">
+        <aside class="canvas-left"><div class="smallcaps">研究关系图</div><h2>IM 接入的逻辑链</h2><div class="legend"><div class="legend-item"><span class="legend-swatch" style="background:#ddd8ff"></span>已有能力</div><div class="legend-item"><span class="legend-swatch" style="background:#fff0bd"></span>业务场景</div><div class="legend-item"><span class="legend-swatch" style="background:#dff4e6"></span>方向</div><div class="legend-item"><span class="legend-swatch" style="background:#ffe3dc"></span>风险 / 约束</div></div><div class="canvas-hint">画布适合把“能力—场景—需求—方向”放在同一视野。点击任一节点查看它的证据与后续问题。</div></aside>
+        <section class="mind-canvas"><div class="canvas-top"><div><h1>IM 接入 · 关系画布</h1><p>研究关系，而不是用画布替代文档</p></div><div class="zoom"><button>−</button><button>＋</button></div></div>
+          <svg class="links" viewBox="0 0 900 800" preserveAspectRatio="none"><path class="link" d="M180 200 C290 200 300 280 380 300"/><path class="link" d="M190 410 C300 400 310 330 390 320"/><path class="link hot" d="M530 305 C650 250 670 200 750 190"/><path class="link hot" d="M530 330 C650 390 680 440 760 445"/><path class="link" d="M480 360 C500 470 480 500 480 565"/></svg>
+          <button class="node capacity" data-node="capacity"><small>已有能力</small><strong>Lily 招聘闭环</strong><span>找人、沟通、职位、看板</span></button>
+          <button class="node scene" data-node="scene"><small>招聘场景</small><strong>IM 中的工作时刻</strong><span>接需求、催进度、收结果</span></button>
+          <button class="node need-node selected" data-node="need"><small>未满足诉求</small><strong>任务与上下文不应断裂</strong><span>轻量触发，复杂闭环可追溯</span></button>
+          <button class="node direction-a" data-node="direction-a"><small>方向 A</small><strong>招聘任务入口</strong><span>IM 发起、进度、结果；主站完成</span></button>
+          <button class="node direction-b" data-node="direction-b"><small>方向 B</small><strong>企业上下文入口</strong><span>授权文档成为可引用事实</span></button>
+          <button class="node question" data-node="question"><small>待对齐</small><strong>平台与权限边界</strong><span>哪些平台、哪些操作、哪些指标</span></button>
+        </section>
+        <aside class="inspector"><div class="smallcaps">节点详情</div><h2>选择一个对象</h2><div class="inspect-card" id="inspect-card"><small>未满足诉求</small><h3>任务与上下文不应断裂</h3><p>用户需要能在 IM 中推进招聘，而不是多一个只会聊天的入口。</p><div class="inspect-list"><div><b>证据</b>远程派活、任务完成通知、文档读取三类原始诉求。</div><div><b>下一问</b>哪些任务可以在 IM 内闭环，哪些必须回主站？</div></div></div></aside>
+      </section>`;
+    }
+
+    function runRail(active) { const labels = ['✓ 需求录入','2 主 Agent 规划','3 并行研究','4 汇总质询','5 沉淀']; return `<div class="run-rail">${labels.map((label, i) => `<span class="run-step ${i < active ? 'done' : i === active ? 'active' : ''}">${label}</span>${i < 4 ? '<span class="run-arrow">→</span>' : ''}`).join('')}</div>`; }
+    function hydrateRunView() {
+      const content = document.querySelector('#doc-content'); if (!content) return;
+      content.innerHTML = `<div class="eyebrow"><span class="pill"><span class="dot"></span>新建研究 Run</span><span>项目上下文已自动带入</span></div><h1>把一句话需求，变成一轮可控的协作</h1><p class="lead">主 Agent 先规划研究路径；只有计划确认后，才并行调用专职 Agent。每个结果都回到当前项目，等待汇总、质询和沉淀。</p>${runRail(1)}<div class="run-input"><label>原始需求 · 用户输入</label><p>给 Lily 接飞书、企微、钉钉和微信，让 HR 能在 IM 中派活、接收通知，并读取企业文档。</p><div class="run-meta"><span>来源：需求讨论</span><span>当前项目：IM 接入</span><span>尚未进入 PRD</span></div></div><div class="plan-box"><div class="plan-head"><h3>主 Agent 规划 · 等待确认</h3><small>规划依据：项目记忆 + 当前需求</small></div><p class="plan-copy">我把需求拆成 4 个相互独立的研究包，先补齐事实和限制，再讨论产品方向；不会直接替你做最终决策。</p><div class="plan-grid"><div class="agent-job"><b>现有能力与影响面</b><span>盘点 Lily、Hermes、现有连接器能力</span><em>准备并行</em></div><div class="agent-job"><b>招聘场景与 IM 作用</b><span>还原接需求、催进度、收结果</span><em>准备并行</em></div><div class="agent-job"><b>平台能力与限制</b><span>飞书 / 企微 / 钉钉 / 微信</span><em>准备并行</em></div><div class="agent-job pending"><b>竞品与产品参考</b><span>只验证能改变方案的关键证据</span><em>需确认范围</em></div></div><div class="plan-actions"><button class="primary" id="start-run">确认计划，开始并行</button><button id="edit-plan">调整研究包</button></div></div><div class="synthesis-box"><h3>完成后会生成什么</h3><p>事实与证据、未满足诉求、多个产品方向、红队质询、待领导拍板问题。</p><div class="persist-row"><button>保存方向研究稿</button><button>生成领导沟通稿</button><button>沉淀产品判断</button></div></div>`;
+      document.querySelector('#start-run')?.addEventListener('click', () => showRunPhase(2));
+      document.querySelector('#edit-plan')?.addEventListener('click', () => { document.querySelector('.plan-copy').textContent = '计划已进入编辑态：你可以删除研究包、改写范围，或指定某个 Agent 必须引用项目资料。'; });
+    }
+    function showRunPhase(phase) {
+      const content = document.querySelector('#doc-content'); if (!content) return;
+      if (phase === 2) { content.innerHTML = `<div class="eyebrow"><span class="pill"><span class="dot"></span>Run 执行中</span><span>4 个研究包并行处理</span></div><h1>正在把需求拆成可验证的事实</h1><p class="lead">主 Agent 正在等待各个研究包返回；你可以查看过程，也可以随时让 Lily 调整范围。</p>${runRail(2)}<div class="plan-box"><div class="plan-head"><h3>并行研究 · 进行中</h3><small>已完成 1 / 4 · 用时 01:42</small></div><div class="plan-grid"><div class="agent-job"><b>现有能力与影响面</b><span>发现 5 项能力，2 个系统影响面</span><em>已完成 · 查看结果</em></div><div class="agent-job"><b>招聘场景与 IM 作用</b><span>已识别 3 / 6 个关键场景</span><em>执行中 · 查看发现</em></div><div class="agent-job"><b>平台能力与限制</b><span>飞书完成，企微正在读取</span><em>执行中 · 查看来源</em></div><div class="agent-job pending"><b>竞品与产品参考</b><span>等待平台范围确认</span><em>等待 · 调整范围</em></div></div><div class="plan-actions"><button class="primary" id="finish-run">模拟全部完成，进入汇总</button><button id="pause-run">暂停未完成任务</button></div></div><div class="synthesis-box"><h3>执行中你能看到什么</h3><p>任务状态、阶段进度、已返回的结论和证据；完整工具日志保持在展开层。</p></div></div>`; document.querySelector('#finish-run').addEventListener('click', () => showRunPhase(3)); document.querySelector('#pause-run').addEventListener('click', e => { e.target.textContent = '已暂停，可继续'; }); }
+      if (phase === 3) { content.innerHTML = `<div class="eyebrow"><span class="pill"><span class="dot"></span>需要你的判断</span><span>并行研究已完成</span></div><h1>主 Agent 汇总了结果，也发现了分歧</h1><p class="lead">先区分事实、推断和未知，再决定是否进入 PRD。</p>${runRail(3)}<div class="plan-box"><div class="plan-head"><h3>汇总与红队质询</h3><small>4 个研究包 · 12 条证据</small></div><div class="synthesis-box"><h3>核心分歧</h3><p>场景 Agent 认为“远程派活”最高频；平台 Agent 认为“企业上下文读取”才是差异化。当前证据不足以合并为一个方向。</p></div><div class="agent-job" style="margin-top:10px"><b>主 Agent 判断</b><span>拆成“招聘任务入口”和“企业上下文入口”两个方向，带去和领导对齐；暂不生成最终 PRD。</span><em>待你确认</em></div><div class="plan-actions"><button class="primary" id="persist-run">确认判断，进入沉淀</button><button id="ask-run">追问：为什么拆成两个方向？</button></div></div>`; document.querySelector('#persist-run').addEventListener('click', () => showRunPhase(4)); document.querySelector('#ask-run').addEventListener('click', e => { e.textContent = '已在右侧 Lily 对话中生成追问'; }); }
+      if (phase === 4) { content.innerHTML = `<div class="eyebrow"><span class="pill"><span class="dot"></span>Run 已完成</span><span>结果已写入当前项目</span></div><h1>这轮协作留下了可复用的判断</h1><p class="lead">研究过程结束，产出已经从聊天中分离为项目资产。</p>${runRail(4)}<div class="plan-box"><div class="plan-head"><h3>可沉淀产物</h3><small>IM 接入 / 研究阶段</small></div><div class="plan-grid"><div class="agent-job"><b>方向研究稿</b><span>事实、证据、未满足诉求、两个方向</span><em>准备保存</em></div><div class="agent-job"><b>领导沟通稿</b><span>背景、判断、待拍板问题</span><em>准备生成</em></div><div class="agent-job"><b>产品判断</b><span>IM 是入口还是上下文，取决于真实场景频率</span><em>长期沉淀</em></div><div class="agent-job"><b>待验证事项</b><span>跨端完成率、资料授权接受度</span><em>加入验证列表</em></div></div><div class="plan-actions"><button class="primary" id="save-done">保存全部产物</button></div></div>`; document.querySelector('#save-done').addEventListener('click', e => { e.textContent = '已保存到项目'; e.disabled = true; }); }
+    }
+
+    function render() {
+      stage.innerHTML = current === 1 ? workbench() : current === 2 ? conversation() : canvas();
+      if (current === 1) hydrateRunView();
+      document.querySelector('#variant-kicker').textContent = current === 1 ? '项目协作 Run · 主 Agent 规划' : `信息架构比较 · ${current} / 3 · ${names[current - 1]}`;
+      document.querySelectorAll('#variant-picker button').forEach(button => button.setAttribute('aria-pressed', String(Number(button.dataset.variant) === current)));
+      history.replaceState(null, '', `?v=${current}`);
+      bindInteractions();
+    }
+
+    function bindInteractions() {
+      document.querySelectorAll('.direction').forEach(card => card.addEventListener('click', () => { document.querySelectorAll('.direction').forEach(item => item.classList.remove('selected')); card.classList.add('selected'); }));
+      document.querySelectorAll('.nav-item[data-section]').forEach(item => item.addEventListener('click', () => { document.querySelectorAll('.nav-item[data-section]').forEach(nav => nav.classList.remove('active')); item.classList.add('active'); }));
+      document.querySelector('#collapse-agent')?.addEventListener('click', () => { document.querySelector('#agent-sidecar').classList.add('hidden'); });
+      document.querySelector('#align-brief')?.addEventListener('click', () => document.querySelector('#agent-output').classList.add('show'));
+      document.querySelector('#side-send')?.addEventListener('click', () => { const input = document.querySelector('#side-input'); const text = input.value.trim(); if (!text) return; const feed = document.querySelector('#side-chat'); const user = document.createElement('div'); user.className = 'chat-line user'; user.innerHTML = `<b>你</b>${text}`; const answer = document.createElement('div'); answer.className = 'chat-line'; answer.innerHTML = '<b>Lily</b>我会把这个问题挂到当前项目的研究稿里，并标记需要验证的事实与待拍板决策。'; feed.append(user, answer); input.value = ''; feed.scrollTop = feed.scrollHeight; });
+      document.querySelectorAll('[data-chat-action]').forEach(button => button.addEventListener('click', () => {
+        const copy = { state: '已补充：飞书、企微、钉钉、微信的发送、授权、数据读取限制已进入全量状态表。', directions: '已生成两个方向：招聘任务入口、企业上下文入口。下一步是比较成功指标与边界。', brief: '已生成沟通提纲：现状、未满足诉求、两个方向、三项需要拍板的问题。' }[button.dataset.chatAction];
+        const msg = document.createElement('div'); msg.className = 'msg'; msg.innerHTML = `<div class="avatar">L</div><div class="bubble"><p>${copy}</p></div>`; document.querySelector('#conversation').append(msg); document.querySelector('#draft-next').textContent = button.dataset.chatAction === 'brief' ? '准备与领导对齐' : '把新结论合入方向研究稿'; msg.scrollIntoView({behavior:'smooth', block:'nearest'});
+      }));
+      const detail = { capacity: ['已有能力', 'Lily 招聘闭环', '职位、人才搜索、沟通和招聘看板已经形成主站闭环。IM 不应重复实现这一层。', '下一问：哪种轻量操作会显著缩短招聘推进时间？'], scene: ['招聘场景', 'IM 中的工作时刻', '需求临时进入、候选人状态变化、招聘负责人催进度，是 IM 的自然时刻。', '下一问：每个时刻对应什么信息密度和动作？'], need: ['未满足诉求', '任务与上下文不应断裂', '用户需要能在 IM 中推进招聘，而不是多一个只会聊天的入口。', '下一问：哪些任务可以在 IM 内闭环，哪些必须回主站？'], 'direction-a': ['方向 A', '招聘任务入口', 'IM 发起、查询进度、接收关键结果；主站继续承载批量筛选、编辑和高风险操作。', '待验证：跨端回主站的完成率与用户接受度。'], 'direction-b': ['方向 B', '企业上下文入口', '把取得授权的会议纪要、文档转为可追溯引用，降低需求理解损耗。', '待验证：资料权限模型与引用展示。'], question: ['待对齐', '平台与权限边界', '平台差异会决定功能可达性；不能用统一“连接器”掩盖能力和合规差异。', '需要领导拍板：首期平台、优先闭环、衡量指标。'] };
+      document.querySelectorAll('.node').forEach(node => node.addEventListener('click', () => { const [type, title, text, next] = detail[node.dataset.node]; document.querySelectorAll('.node').forEach(item => item.classList.remove('selected')); node.classList.add('selected'); document.querySelector('#inspect-card').innerHTML = `<small>${type}</small><h3>${title}</h3><p>${text}</p><div class="inspect-list"><div><b>下一问</b>${next}</div></div>`; }));
+    }
+    document.querySelectorAll('#variant-picker button').forEach(button => button.addEventListener('click', () => { current = Number(button.dataset.variant); render(); }));
+    document.addEventListener('keydown', event => { if (['1','2','3'].includes(event.key)) { current = Number(event.key); render(); } if (event.key === 'ArrowLeft') { current = current === 1 ? 3 : current - 1; render(); } if (event.key === 'ArrowRight') { current = current === 3 ? 1 : current + 1; render(); } });
+    render();
+  </script>
+</body>
+</html>

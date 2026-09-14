@@ -1,0 +1,38 @@
+{"ts":"2026-09-06T16:32:24.638Z","cmd":"goto","args":"http://127.0.0.1:4317","origin":"http://127.0.0.1:4317/","durationMs":15,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:24.705Z","cmd":"snapshot","args":"-i","origin":"http://127.0.0.1:4317/","durationMs":37,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:24.735Z","cmd":"console","args":"","origin":"http://127.0.0.1:4317/","durationMs":1,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:24.762Z","cmd":"network","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.728Z","cmd":"click","args":"@e6","origin":"http://127.0.0.1:4317/","durationMs":45,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.762Z","cmd":"snapshot","args":"-D","origin":"http://127.0.0.1:4317/","durationMs":3,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.810Z","cmd":"click","args":"@e19","origin":"http://127.0.0.1:4317/","durationMs":18,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.843Z","cmd":"snapshot","args":"-D","origin":"http://127.0.0.1:4317/","durationMs":2,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.893Z","cmd":"click","args":"@e4","origin":"http://127.0.0.1:4317/","durationMs":18,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.923Z","cmd":"snapshot","args":"-D","origin":"http://127.0.0.1:4317/","durationMs":2,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.951Z","cmd":"console","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:41.979Z","cmd":"network","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:49.351Z","cmd":"fill","args":"@e13 请生成一份海外支付方案 PRD，包含目标、范围、风险和下一步","origin":"http://127.0.0.1:4317/","durationMs":5,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:49.413Z","cmd":"click","args":"@e15","origin":"http://127.0.0.1:4317/","durationMs":31,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:49.454Z","cmd":"wait","args":"1000","origin":"http://127.0.0.1:4317/","durationMs":3,"status":"error","hasCookies":false,"mode":"launched","error":"for: Error while parsing css selector \"1000\". Did you mean to CSS.escape it?\nCall log:\n\u001b[2m  - waiting for 1000 to be visible\u001b[22m\n"}
+{"ts":"2026-09-06T16:32:49.487Z","cmd":"snapshot","args":"-D","origin":"http://127.0.0.1:4317/","durationMs":3,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:49.515Z","cmd":"console","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:32:49.543Z","cmd":"network","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:33:32.395Z","cmd":"goto","args":"http://127.0.0.1:4317","origin":"http://127.0.0.1:4317/","durationMs":9,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:33:32.434Z","cmd":"snapshot","args":"-i","origin":"http://127.0.0.1:4317/","durationMs":7,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:33:32.469Z","cmd":"fill","args":"@e13 请生成一份海外支付方案 PRD","origin":"http://127.0.0.1:4317/","durationMs":3,"status":"error","hasCookies":false,"mode":"launched","error":"fill: Error: Element is not an <input>, <textarea>, <select> or [contenteditable] and does not have a role allowing [aria-readonly]\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '×' }).nth(2)\u001b[22m\n\u001b[2m    - locator resolved to <button data-close=\"meeting\">×</button>\u001b[22m\n\u001b[2m    - fill(\"…"}
+{"ts":"2026-09-06T16:33:32.898Z","cmd":"click","args":"@e15","origin":"http://127.0.0.1:4317/","durationMs":400,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:33:32.957Z","cmd":"wait","args":"1200","origin":"http://127.0.0.1:4317/","durationMs":1,"status":"error","hasCookies":false,"mode":"launched","error":"for: Error while parsing css selector \"1200\". Did you mean to CSS.escape it?\nCall log:\n\u001b[2m  - waiting for 1200 to be visible\u001b[22m\n"}
+{"ts":"2026-09-06T16:33:32.996Z","cmd":"snapshot","args":"-D","origin":"http://127.0.0.1:4317/","durationMs":4,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:33:33.030Z","cmd":"console","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:33:33.063Z","cmd":"network","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:34:11.190Z","cmd":"fill","args":"@e12 请生成一份海外支付方案 PRD","origin":"http://127.0.0.1:4317/","durationMs":3,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:34:11.246Z","cmd":"click","args":"@e14","origin":"http://127.0.0.1:4317/","durationMs":23,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:34:13.321Z","cmd":"snapshot","args":"-D","origin":"http://127.0.0.1:4317/","durationMs":4,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:34:13.357Z","cmd":"console","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:34:13.390Z","cmd":"network","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:35:14.728Z","cmd":"goto","args":"http://127.0.0.1:4317","origin":"http://127.0.0.1:4317/","durationMs":8,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:35:14.768Z","cmd":"snapshot","args":"-i","origin":"http://127.0.0.1:4317/","durationMs":7,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:35:15.231Z","cmd":"fill","args":"@e3 请生成一份海外支付方案 PRD，包含目标、范围、风险和下一步","origin":"http://127.0.0.1:4317/","durationMs":433,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:35:15.314Z","cmd":"click","args":"@e4","origin":"http://127.0.0.1:4317/","durationMs":25,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:35:20.385Z","cmd":"snapshot","args":"-D","origin":"http://127.0.0.1:4317/","durationMs":4,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:35:20.424Z","cmd":"console","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}
+{"ts":"2026-09-06T16:35:20.457Z","cmd":"network","args":"","origin":"http://127.0.0.1:4317/","durationMs":0,"status":"ok","hasCookies":false,"mode":"launched"}

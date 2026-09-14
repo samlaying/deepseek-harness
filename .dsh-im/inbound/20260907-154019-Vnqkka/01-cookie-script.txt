@@ -1,0 +1,11 @@
+【用法】在已登录的 oct.tongdao.cn 页面按 F12 → Console → 清空后粘贴下面整段 → 回车
+【结果】cookie 已复制到剪贴板 + 控制台打印，把打印内容发给 Agent
+
+var c = document.cookie;
+copy(c);
+var a = document.createElement('a');
+a.href = URL.createObjectURL(new Blob([c], {type: 'text/plain'}));
+a.download = 'cookie.txt';
+a.click();
+console.log('=== 以下就是 cookie，全部复制发给 Agent ===');
+console.log(c);

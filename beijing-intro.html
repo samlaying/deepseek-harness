@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>北京｜古都与未来交汇的城市</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --red: #a51c30;
+      --gold: #d9a441;
+      --ink: #1d1d1f;
+      --muted: #666a73;
+      --paper: #fff8ed;
+      --mist: #f4efe7;
+      --blue: #17324d;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "PingFang SC", "Microsoft YaHei", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 10%, rgba(217, 164, 65, 0.28), transparent 28rem),
+        radial-gradient(circle at 85% 0%, rgba(165, 28, 48, 0.18), transparent 25rem),
+        linear-gradient(135deg, #fffaf2 0%, #f1e3cf 100%);
+      overflow-x: hidden;
+    }
+
+    .page {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      position: relative;
+      padding: 72px 0 46px;
+    }
+
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 72px;
+      color: var(--blue);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: conic-gradient(from 220deg, var(--red), #c8472d, var(--gold), var(--red));
+      box-shadow: 0 16px 40px rgba(165, 28, 48, 0.22);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 26px;
+      list-style: none;
+      font-size: 14px;
+      color: rgba(23, 50, 77, 0.72);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      align-items: center;
+      gap: 54px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      border: 1px solid rgba(165, 28, 48, 0.18);
+      border-radius: 999px;
+      color: var(--red);
+      background: rgba(255, 255, 255, 0.55);
+      backdrop-filter: blur(10px);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 26px;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 0 6px rgba(217, 164, 65, 0.16);
+    }
+
+    h1 {
+      font-size: clamp(48px, 7vw, 96px);
+      line-height: 0.96;
+      letter-spacing: -0.07em;
+      color: var(--blue);
+    }
+
+    h1 span {
+      display: block;
+      color: var(--red);
+    }
+
+    .hero p {
+      max-width: 590px;
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 19px;
+      line-height: 1.9;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-top: 36px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 22px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 800;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .button.primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--red), #c73f2d);
+      box-shadow: 0 18px 42px rgba(165, 28, 48, 0.26);
+    }
+
+    .button.secondary {
+      color: var(--blue);
+      border: 1px solid rgba(23, 50, 77, 0.16);
+      background: rgba(255, 255, 255, 0.56);
+    }
+
+    .button:hover {
+      transform: translateY(-2px);
+    }
+
+    .visual {
+      position: relative;
+      min-height: 520px;
+      border-radius: 42px;
+      background:
+        linear-gradient(180deg, rgba(23, 50, 77, 0.08), rgba(255, 255, 255, 0.05)),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.24));
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow: 0 34px 80px rgba(54, 32, 18, 0.16);
+      overflow: hidden;
+    }
+
+    .sun {
+      position: absolute;
+      top: 46px;
+      right: 58px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f7cc69 0%, var(--gold) 56%, rgba(217, 164, 65, 0) 68%);
+      opacity: 0.92;
+    }
+
+    .temple {
+      position: absolute;
+      left: 50%;
+      bottom: 76px;
+      width: 78%;
+      height: 250px;
+      transform: translateX(-50%);
+    }
+
+    .roof {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 92%;
+      height: 62px;
+      background: linear-gradient(135deg, #8d1426, #c9392d);
+      clip-path: polygon(4% 100%, 15% 24%, 50% 0, 85% 24%, 96% 100%);
+      box-shadow: 0 12px 0 rgba(103, 24, 31, 0.26);
+    }
+
+    .roof.second {
+      top: 76px;
+      width: 72%;
+      height: 54px;
+    }
+
+    .hall {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 58%;
+      height: 118px;
+      transform: translateX(-50%);
+      border-radius: 18px 18px 0 0;
+      background: linear-gradient(180deg, #d9a441, #b87d25);
+      box-shadow: inset 0 0 0 8px rgba(255, 231, 170, 0.18);
+    }
+
+    .columns {
+      position: absolute;
+      inset: 24px 28px 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .columns i {
+      border-radius: 999px 999px 0 0;
+      background: linear-gradient(180deg, #8d1426, #66121c);
+    }
+
+    .cloud {
+      position: absolute;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.58);
+      filter: blur(0.2px);
+    }
+
+    .cloud.one { width: 150px; height: 36px; left: 42px; top: 132px; }
+    .cloud.two { width: 220px; height: 42px; right: 38px; bottom: 215px; opacity: 0.7; }
+    .cloud.three { width: 120px; height: 28px; left: 96px; bottom: 130px; opacity: 0.62; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin: 20px 0 72px;
+    }
+
+    .stat, .card {
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 24px 60px rgba(54, 32, 18, 0.1);
+    }
+
+    .stat {
+      padding: 24px;
+      border-radius: 28px;
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--red);
+      font-size: 34px;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .stat span {
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    section {
+      padding: 48px 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    h2 {
+      color: var(--blue);
+      font-size: clamp(32px, 4vw, 54px);
+      letter-spacing: -0.05em;
+    }
+
+    .section-title p {
+      max-width: 470px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .card {
+      position: relative;
+      min-height: 280px;
+      padding: 28px;
+      border-radius: 32px;
+      overflow: hidden;
+      transition: transform 220ms ease, box-shadow 220ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 34px 70px rgba(54, 32, 18, 0.16);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      right: -46px;
+      bottom: -46px;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: rgba(217, 164, 65, 0.16);
+    }
+
+    .icon {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 42px;
+      border-radius: 18px;
+      color: #fff;
+      background: linear-gradient(135deg, var(--blue), #2b5f85);
+      font-size: 26px;
+    }
+
+    .card h3 {
+      color: var(--red);
+      font-size: 24px;
+      margin-bottom: 14px;
+    }
+
+    .card p {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .banner {
+      margin: 54px 0 28px;
+      padding: 42px;
+      border-radius: 38px;
+      color: #fff;
+      background:
+        linear-gradient(90deg, rgba(23, 50, 77, 0.96), rgba(165, 28, 48, 0.88)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='rgba(255,255,255,0.16)' stroke-width='1'%3E%3Cpath d='M0 80h160M80 0v160M20 20c40 25 80 25 120 0M20 140c40-25 80-25 120 0'/%3E%3C/g%3E%3C/svg%3E");
+      box-shadow: 0 34px 80px rgba(23, 50, 77, 0.22);
+    }
+
+    .banner h2 {
+      color: #fff;
+      margin-bottom: 14px;
+    }
+
+    .banner p {
+      max-width: 780px;
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 18px;
+      line-height: 1.9;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 16px;
+      margin-top: 26px;
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 20px;
+      padding: 22px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.48);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .timeline-item strong {
+      color: var(--red);
+      font-size: 20px;
+    }
+
+    .timeline-item p {
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    footer {
+      padding: 58px 0 70px;
+      text-align: center;
+      color: rgba(23, 50, 77, 0.6);
+    }
+
+    @media (max-width: 900px) {
+      .hero,
+      .grid,
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .visual {
+        min-height: 430px;
+      }
+
+      .section-title {
+        display: block;
+      }
+
+      .section-title p {
+        margin-top: 12px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .page {
+        width: min(100% - 24px, 1180px);
+      }
+
+      header {
+        padding-top: 34px;
+      }
+
+      nav {
+        align-items: flex-start;
+        margin-bottom: 48px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .visual {
+        border-radius: 28px;
+      }
+
+      .timeline-item {
+        grid-template-columns: 1fr;
+      }
+
+      .banner {
+        padding: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="page">
+    <nav aria-label="页面导航">
+      <div class="brand"><span class="brand-mark">京</span>BEIJING</div>
+      <ul class="nav-links">
+        <li>历史</li>
+        <li>地标</li>
+        <li>文化</li>
+        <li>生活</li>
+      </ul>
+    </nav>
+
+    <div class="hero">
+      <div>
+        <div class="eyebrow">中国首都 · 千年古都 · 国际都市</div>
+        <h1>北京<span>古今交汇</span></h1>
+        <p>北京是一座把皇家气象、胡同烟火、科技创新与开放活力放在同一条街上的城市。你可以在晨光里走过故宫红墙，也可以在夜色中看见中关村与国贸的灯火。</p>
+        <div class="actions">
+          <a class="button primary" href="#landmarks">探索地标</a>
+          <a class="button secondary" href="#culture">感受文化</a>
+        </div>
+      </div>
+
+      <div class="visual" aria-label="北京城市插画">
+        <div class="sun"></div>
+        <div class="cloud one"></div>
+        <div class="cloud two"></div>
+        <div class="cloud three"></div>
+        <div class="temple">
+          <div class="roof"></div>
+          <div class="roof second"></div>
+          <div class="hall">
+            <div class="columns"><i></i><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="stats" aria-label="北京概览">
+      <div class="stat"><strong>3000+</strong><span>多年建城史，承载华夏文明的深厚记忆。</span></div>
+      <div class="stat"><strong>870+</strong><span>平方公里中心城区，从胡同到CBD层次分明。</span></div>
+      <div class="stat"><strong>四季</strong><span>春有花、秋有叶，冬看雪落红墙，夏听雨过屋檐。</span></div>
+    </div>
+
+    <section id="landmarks">
+      <div class="section-title">
+        <h2>不可错过的地标</h2>
+        <p>北京的地标不是单纯的景点，它们记录着城市的礼制、生活、审美和现代化速度。</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="icon">宫</div>
+          <h3>故宫与中轴线</h3>
+          <p>沿中轴线漫步，从永定门、天安门到钟鼓楼，能看见一座城市对秩序、空间与仪式感的独特理解。</p>
+        </article>
+        <article class="card">
+          <div class="icon">城</div>
+          <h3>长城与山脊</h3>
+          <p>八达岭、慕田峪、司马台各有风貌。登上城墙，群山如浪，历史像风一样从砖石间穿过。</p>
+        </article>
+        <article class="card">
+          <div class="icon">塔</div>
+          <h3>颐和园与皇家园林</h3>
+          <p>昆明湖、万寿山、长廊与佛香阁组成开阔而精致的画卷，展示中国园林借景与层次之美。</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="culture">
+      <div class="banner">
+        <h2>真正的北京，在胡同与餐桌之间</h2>
+        <p>清晨的一碗豆汁儿、午后胡同里的树影、傍晚剧场里的京韵、夜晚簋街的灯火，共同组成北京的日常质感。这里既有宏大的历史，也有热气腾腾的人间生活。</p>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>一天认识北京</h2>
+        <p>如果只有一天，可以把时间交给这条路线：历史、烟火、艺术与夜景都刚刚好。</p>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <strong>上午</strong>
+          <p>从天安门广场出发，走进故宫，观察红墙、琉璃瓦、宫殿轴线与院落层次。</p>
+        </div>
+        <div class="timeline-item">
+          <strong>下午</strong>
+          <p>去什刹海和南锣鼓巷一带穿行胡同，找一家小店喝茶，感受老城的慢节奏。</p>
+        </div>
+        <div class="timeline-item">
+          <strong>晚上</strong>
+          <p>到国家大剧院、三里屯或国贸看北京的另一面：现代、开放、明亮而充满能量。</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="page">
+    <p>北京，既是历史的回声，也是未来的开场。</p>
+  </footer>
+</body>
+</html>
